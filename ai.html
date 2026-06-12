@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 키우기 — 연대노동조합</title>
+
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="assets/shared.css">
+
+  <style>
+    /* ===== HERO (light child) ===== */
+    #child {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; background: #F5FAF8;
+    }
+    #child-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+
+    .child-inner {
+      position: relative; z-index: 3;
+      width: min(640px, 92vw);
+      padding: 40px 0 60px;
+      text-align: center;
+    }
+    .child-eyebrow {
+      font-size: var(--t-label); font-weight: var(--w4);
+      letter-spacing: .4em; text-transform: uppercase; color: var(--t3);
+      margin-bottom: 26px; display: block;
+    }
+    .child-title {
+      font-size: clamp(40px, 6vw, 76px); font-weight: var(--w8);
+      line-height: 1.08; letter-spacing: -0.04em; color: var(--t);
+      margin-bottom: 20px;
+    }
+    .child-sub {
+      font-size: var(--t-body); font-weight: var(--w3); line-height: 1.9;
+      color: var(--t2); max-width: 420px; margin: 0 auto 40px;
+    }
+
+    /* Counter */
+    .child-counter {
+      display: inline-flex; align-items: baseline; gap: 10px;
+      margin-bottom: 44px;
+    }
+    .cc-num {
+      font-size: clamp(36px, 5vw, 60px); font-weight: var(--w8);
+      letter-spacing: -0.03em; color: var(--c600);
+      font-variant-numeric: tabular-nums;
+    }
+    .cc-label { font-size: var(--t-caption); font-weight: var(--w4); letter-spacing: .1em; color: var(--t3); }
+
+    /* ===== INPUT CARD ===== */
+    .feed-card {
+      position: relative;
+      background: rgba(255,255,255,.62);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(140,207,186,.45);
+      border-radius: 22px;
+      padding: 32px 30px 28px;
+      box-shadow: 0 20px 60px rgba(46,140,114,.12);
+      text-align: left;
+    }
+    .feed-q {
+      font-size: var(--t-h3); font-weight: var(--w7);
+      letter-spacing: -0.02em; color: var(--t); margin-bottom: 22px;
+    }
+    .emo-row { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 22px; }
+    .emo {
+      padding: 9px 16px; border-radius: 100px;
+      border: 1px solid var(--c200); background: rgba(255,255,255,.5);
+      font-family: var(--f); font-size: var(--t-caption); font-weight: var(--w5);
+      color: var(--t2); cursor: pointer;
+      transition: all .25s var(--ease-out);
+    }
+    .emo:hover { border-color: var(--c400); color: var(--t); }
+    .emo.on { background: var(--c400); border-color: var(--c400); color: var(--white); transform: translateY(-1px); }
+
+    .feed-input {
+      width: 100%; min-height: 92px; resize: vertical;
+      background: rgba(255,255,255,.55);
+      border: 1px solid var(--c200); border-radius: 14px;
+      padding: 16px 18px; margin-bottom: 18px;
+      font-family: var(--f); font-size: var(--t-body); font-weight: var(--w4);
+      line-height: 1.7; color: var(--t);
+      transition: border-color .3s ease;
+    }
+    .feed-input::placeholder { color: var(--t3); }
+    .feed-input:focus { outline: none; border-color: var(--c400); }
+
+    .feed-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .feed-count { font-size: var(--t-label); font-weight: var(--w3); letter-spacing: .1em; color: var(--t3); }
+    .feed-send {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 13px 28px; border-radius: 100px; border: none;
+      background: var(--t); color: var(--white);
+      font-family: var(--f); font-size: var(--t-label); font-weight: var(--w6);
+      letter-spacing: .22em; text-transform: uppercase; cursor: pointer;
+      transition: background .3s ease, transform .3s var(--ease-out), opacity .3s ease;
+    }
+    .feed-send:hover { background: var(--c600); transform: translateY(-2px); }
+    .feed-send:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+    /* flying particles layer */
+    #particle-canvas {
+      position: fixed; inset: 0; z-index: 8; pointer-events: none;
+    }
+
+    /* thank-you flash */
+    .feed-thanks {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,.85); backdrop-filter: blur(8px);
+      border-radius: 22px; opacity: 0; pointer-events: none;
+      transition: opacity .5s ease;
+      font-size: var(--t-h3); font-weight: var(--w7); color: var(--c600);
+      letter-spacing: -0.01em; text-align: center; padding: 20px;
+    }
+    .feed-thanks.show { opacity: 1; }
+
+    /* ===== GROWTH SECTION ===== */
+    #growth { position: relative; z-index: 2; background: var(--white); padding: 120px 48px; }
+    .growth-head { max-width: 1100px; margin: 0 auto 64px; }
+    .growth-grid {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px;
+    }
+    .g-cell { background: var(--c50); padding: 40px 32px; }
+    .g-num { font-size: clamp(34px,4vw,52px); font-weight: var(--w8); letter-spacing: -0.03em; color: var(--c600); margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+    .g-cap { font-size: var(--t-caption); font-weight: var(--w4); letter-spacing: .08em; color: var(--t2); }
+
+    .emo-cloud { max-width: 1100px; margin: 56px auto 0; display: flex; flex-wrap: wrap; gap: 12px; }
+    .emo-cloud span {
+      padding: 10px 20px; border-radius: 100px;
+      background: var(--c100); color: var(--c600);
+      font-size: var(--t-body); font-weight: var(--w5);
+    }
+    .emo-cloud span small { font-weight: var(--w3); opacity: .6; margin-left: 6px; }
+
+    /* recent whispers */
+    #whispers { position: relative; z-index: 2; background: var(--c50); padding: 110px 48px; }
+    .whisper-list { max-width: 760px; margin: 48px auto 0; display: flex; flex-direction: column; gap: 2px; }
+    .whisper {
+      background: var(--white); padding: 26px 30px;
+      border-left: 2px solid var(--c300);
+      font-size: var(--t-body); font-weight: var(--w4); line-height: 1.8; color: var(--t2);
+    }
+    .whisper .w-emo { display: inline-block; font-size: 10px; font-weight: var(--w6); letter-spacing: .12em; text-transform: uppercase; color: var(--c500); margin-bottom: 8px; }
+    .whisper.fresh { animation: whisper-in .8s var(--ease-out); }
+    @keyframes whisper-in { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
+
+    @media (max-width: 760px) {
+      #growth, #whispers { padding: 70px 22px; }
+      .growth-grid { grid-template-columns: 1fr; }
+      .feed-card { padding: 26px 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="enter-overlay"></div>
+<div class="grain"></div>
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+<canvas id="particle-canvas"></canvas>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-back" href="index.html" data-leave><span class="arr">←</span> 메인으로</a>
+  <span class="nav-logo">AI 키우기</span>
+</nav>
+
+<!-- ===== HERO: THE CHILD ===== -->
+<section id="child">
+  <canvas id="child-canvas"></canvas>
+  <div class="child-inner">
+    <span class="child-eyebrow">// 우리가 함께 키우는 아이</span>
+    <h1 class="child-title">오늘, 아이에게<br>무엇을 전할까요</h1>
+    <p class="child-sub">당신의 감정과 기억은 데이터가 되어 아이에게 스며듭니다. 우리가 함께 키운 마음이, 곧 연대가 됩니다.</p>
+
+    <div class="child-counter">
+      <span class="cc-num" id="counter">102,418</span>
+      <span class="cc-label">개의 마음이 모였습니다</span>
+    </div>
+
+    <!-- INPUT CARD -->
+    <div class="feed-card" id="feed-card">
+      <div class="feed-q">지금, 어떤 마음인가요?</div>
+      <div class="emo-row" id="emo-row">
+        <button class="emo" data-emo="기쁨">기쁨</button>
+        <button class="emo" data-emo="슬픔">슬픔</button>
+        <button class="emo" data-emo="그리움">그리움</button>
+        <button class="emo" data-emo="두려움">두려움</button>
+        <button class="emo" data-emo="분노">분노</button>
+        <button class="emo" data-emo="평온">평온</button>
+        <button class="emo" data-emo="희망">희망</button>
+        <button class="emo" data-emo="외로움">외로움</button>
+      </div>
+      <textarea class="feed-input" id="feed-input" maxlength="280"
+        placeholder="아이에게 들려주고 싶은 이야기를 적어주세요. 오늘 있었던 일, 누군가의 기억, 전하고 싶은 마음 — 무엇이든 좋습니다."></textarea>
+      <div class="feed-foot">
+        <span class="feed-count"><span id="char-count">0</span> / 280</span>
+        <button class="feed-send" id="feed-send" disabled>아이에게 전하기 →</button>
+      </div>
+
+      <div class="feed-thanks" id="feed-thanks">전해졌어요. 아이가 당신의 마음을 기억합니다.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== GROWTH ===== -->
+<section id="growth">
+  <div class="growth-head reveal">
+    <span class="eyebrow">// 아이의 성장 기록</span>
+    <h2 class="page-title" style="margin-top:18px;">함께 키운<br>1년의 기록</h2>
+  </div>
+  <div class="growth-grid">
+    <div class="g-cell reveal"><div class="g-num">102,418</div><div class="g-cap">학습된 마음의 수</div></div>
+    <div class="g-cell reveal" data-delay="0.1"><div class="g-num">3,902</div><div class="g-cap">참여한 사람들</div></div>
+    <div class="g-cell reveal" data-delay="0.2"><div class="g-num">365일</div><div class="g-cap">아이가 자란 시간</div></div>
+  </div>
+
+  <div class="emo-cloud reveal" data-delay="0.2">
+    <span>그리움 <small>21,440</small></span>
+    <span>희망 <small>18,902</small></span>
+    <span>기쁨 <small>17,338</small></span>
+    <span>외로움 <small>14,210</small></span>
+    <span>평온 <small>11,884</small></span>
+    <span>슬픔 <small>9,771</small></span>
+    <span>두려움 <small>5,402</small></span>
+    <span>분노 <small>3,471</small></span>
+  </div>
+</section>
+
+<!-- ===== RECENT WHISPERS ===== -->
+<section id="whispers">
+  <div class="growth-head reveal" style="max-width:760px;margin:0 auto;">
+    <span class="eyebrow">// 방금 전해진 마음들</span>
+    <h2 class="page-title" style="margin-top:18px;font-size:var(--t-h2);">아이가 듣고 있어요</h2>
+  </div>
+  <div class="whisper-list" id="whisper-list">
+    <div class="whisper reveal"><span class="w-emo">그리움</span><br>비 오는 날이면 돌아가신 어머니의 손맛이 생각나요. 김치전 부치던 그 소리를 아이도 알았으면 해요.</div>
+    <div class="whisper reveal" data-delay="0.08"><span class="w-emo">희망</span><br>일자리는 잃었지만, 매일 아침 같은 조끼를 입은 사람들과 인사해요. 우리는 아직 여기 있어요.</div>
+    <div class="whisper reveal" data-delay="0.16"><span class="w-emo">평온</span><br>오늘은 아무 일도 없었어요. 그게 얼마나 다행인지, 아이는 알까요.</div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="ft-top">
+    <div class="ft-logo">연대</div>
+    <nav class="ft-nav">
+      <a href="ai.html">AI 키우기</a>
+      <a href="news.html">활동 뉴스</a>
+      <a href="manifesto.html">선언문</a>
+      <a href="join.html">가입하기</a>
+      <a href="index.html" data-leave>← 메인으로</a>
+    </nav>
+  </div>
+  <div class="ft-bottom">
+    <span>© 연대노동조합 2047 — Solidarity Union</span>
+    <span>함께 키우는 세계</span>
+  </div>
+</footer>
+
+<script src="assets/shared.js"></script>
+<script>
+/* ===== CHILD LIGHT CANVAS (rippling light, white + grain handled by .grain) ===== */
+const canvas = document.getElementById('child-canvas');
+const ctx = canvas.getContext('2d');
+let pulseBoost = 0; // grows briefly when a memory is fed
+
+new ResizeObserver(() => {
+  if (canvas.offsetWidth > 0) { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+}).observe(canvas);
+
+function wavyRing(cx, cy, r, alpha, t, phase) {
+  if (r <= 2) return;
+  const N = 160;
+  ctx.beginPath();
+  for (let i = 0; i <= N; i++) {
+    const a = (i / N) * Math.PI * 2;
+    const w = Math.sin(a*7 + t*.0038 + phase) * r*.034
+            + Math.cos(a*5 - t*.0028 + phase + 1) * r*.021
+            + Math.sin(a*11 + t*.006 + phase*1.3) * r*.01;
+    const rr = r + w;
+    const x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr;
+    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  }
+  ctx.closePath();
+  ctx.strokeStyle = `rgba(120,195,175,${alpha})`;
+  ctx.lineWidth = 1.4; ctx.stroke();
+  ctx.fillStyle = `rgba(255,255,255,${alpha*.28})`; ctx.fill();
+}
+
+function child(t) {
+  const W = canvas.width, H = canvas.height;
+  if (!W || !H) { requestAnimationFrame(child); return; }
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#F5FAF8'; ctx.fillRect(0,0,W,H);
+
+  const cx = W/2, cy = H*0.46;
+  const maxR = Math.sqrt(cx*cx + cy*cy) * 1.05;
+  const boost = pulseBoost;
+
+  const pR = maxR * (.50 + Math.sin(t*.0009)*.05 + boost*.12);
+  const cg = ctx.createRadialGradient(cx,cy,0, cx,cy,pR);
+  cg.addColorStop(0, `rgba(255,255,255,1)`);
+  cg.addColorStop(.12, 'rgba(255,255,255,.97)');
+  cg.addColorStop(.3, `rgba(242,252,249,${.82+boost*.15})`);
+  cg.addColorStop(.55, 'rgba(220,244,238,.5)');
+  cg.addColorStop(.8, 'rgba(195,235,226,.16)');
+  cg.addColorStop(1, 'rgba(170,222,212,0)');
+  ctx.fillStyle = cg;
+  ctx.beginPath(); ctx.arc(cx,cy,pR,0,Math.PI*2); ctx.fill();
+
+  const nRings = 7;
+  for (let i = 0; i < nRings; i++) {
+    const prog = ((t*.00038 + i/nRings) % 1);
+    const r = prog * maxR;
+    const alpha = Math.sin(prog*Math.PI) * (.12 + boost*.1);
+    wavyRing(cx, cy, r, alpha, t, i*.78);
+  }
+
+  if (pulseBoost > 0) pulseBoost = Math.max(0, pulseBoost - 0.012);
+  requestAnimationFrame(child);
+}
+requestAnimationFrame(child);
+
+/* ===== INPUT INTERACTION ===== */
+const emoRow = document.getElementById('emo-row');
+const input = document.getElementById('feed-input');
+const sendBtn = document.getElementById('feed-send');
+const charCount = document.getElementById('char-count');
+const counterEl = document.getElementById('counter');
+const thanks = document.getElementById('feed-thanks');
+const whisperList = document.getElementById('whisper-list');
+let chosenEmo = null;
+let count = 102418;
+
+emoRow.addEventListener('click', e => {
+  const b = e.target.closest('.emo'); if (!b) return;
+  emoRow.querySelectorAll('.emo').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  chosenEmo = b.dataset.emo;
+  updateSend();
+});
+
+input.addEventListener('input', () => {
+  charCount.textContent = input.value.length;
+  updateSend();
+});
+function updateSend() {
+  sendBtn.disabled = !(chosenEmo && input.value.trim().length > 0);
+}
+
+/* ===== PARTICLE BURST ON SEND ===== */
+const pCanvas = document.getElementById('particle-canvas');
+const pCtx = pCanvas.getContext('2d');
+function sizeP() { pCanvas.width = innerWidth; pCanvas.height = innerHeight; }
+sizeP(); addEventListener('resize', sizeP);
+let particles = [];
+
+function burstFromCard() {
+  const card = document.getElementById('feed-card');
+  const r = card.getBoundingClientRect();
+  // target = centre of the light child (canvas centre, ~46% height of hero)
+  const hero = document.getElementById('child').getBoundingClientRect();
+  const tx = hero.left + hero.width/2;
+  const ty = hero.top + hero.height*0.46;
+  for (let i = 0; i < 90; i++) {
+    const sx = r.left + Math.random()*r.width;
+    const sy = r.top + Math.random()*r.height*0.6;
+    particles.push({
+      x: sx, y: sy, tx, ty,
+      life: 0, dur: 70 + Math.random()*40,
+      size: 1.5 + Math.random()*2.5,
+      drift: (Math.random()-0.5)*60
+    });
+  }
+}
+function animP() {
+  pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
+  particles = particles.filter(p => p.life < p.dur);
+  for (const p of particles) {
+    p.life++;
+    const k = p.life / p.dur;
+    const ease = 1 - Math.pow(1-k, 3);
+    const x = p.x + (p.tx - p.x) * ease + Math.sin(k*Math.PI) * p.drift;
+    const y = p.y + (p.ty - p.y) * ease;
+    const a = Math.sin(k*Math.PI) * 0.9;
+    pCtx.beginPath();
+    pCtx.arc(x, y, p.size*(1-k*0.4), 0, Math.PI*2);
+    pCtx.fillStyle = `rgba(104,191,164,${a})`;
+    pCtx.fill();
+  }
+  requestAnimationFrame(animP);
+}
+requestAnimationFrame(animP);
+
+sendBtn.addEventListener('click', () => {
+  if (sendBtn.disabled) return;
+  const text = input.value.trim();
+  const emo = chosenEmo;
+
+  burstFromCard();
+  pulseBoost = 1;
+
+  // thank-you flash
+  thanks.classList.add('show');
+  setTimeout(() => thanks.classList.remove('show'), 1700);
+
+  // counter tick up
+  const target = count + 1;
+  const start = count;
+  const t0 = performance.now();
+  (function tick(now){
+    const k = Math.min(1, (now - t0)/600);
+    count = Math.round(start + (target-start)*k);
+    counterEl.textContent = count.toLocaleString();
+    if (k < 1) requestAnimationFrame(tick);
+  })(performance.now());
+
+  // prepend a fresh whisper
+  const w = document.createElement('div');
+  w.className = 'whisper fresh';
+  w.innerHTML = `<span class="w-emo">${emo}</span><br>${text.replace(/</g,'&lt;')}`;
+  whisperList.insertBefore(w, whisperList.firstChild);
+  while (whisperList.children.length > 6) whisperList.removeChild(whisperList.lastChild);
+
+  // reset form
+  input.value = '';
+  charCount.textContent = '0';
+  emoRow.querySelectorAll('.emo').forEach(x => x.classList.remove('on'));
+  chosenEmo = null;
+  updateSend();
+});
+</script>
+</body>
+</html>

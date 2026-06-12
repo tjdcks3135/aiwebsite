@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>아카이브 — 연대노동조합 작업 과정</title>
+
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    :root {
+      --f: 'Pretendard', -apple-system, sans-serif;
+      --c50:  #F2FAF7; --c100: #D9F0E8; --c200: #B2E1D1;
+      --c300: #8CCFBA; --c400: #68BFA4; --c500: #46A88C; --c600: #2E8C72;
+      --dark: #192820; --white: #FAFCFB;
+      --t: #1A2B24; --t2: #3D5449; --t3: #7A9B8E;
+      --ease-out: cubic-bezier(0.16,1,0.3,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-family: var(--f); color: var(--t); background: var(--white); cursor: none; overflow-x: hidden; scroll-behavior: smooth; }
+    body { overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--c50); }
+    ::-webkit-scrollbar-thumb { background: var(--c300); border-radius: 2px; }
+
+    /* ===== CURSOR ===== */
+    #cur-dot { position:fixed; width:6px; height:6px; border-radius:50%; background:var(--c500); pointer-events:none; z-index:9999; transform:translate(-50%,-50%); }
+    #cur-ring { position:fixed; width:32px; height:32px; border-radius:50%; border:1px solid var(--c400); pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:width .4s var(--ease-out),height .4s var(--ease-out),background .4s ease; }
+    #cur-ring.is-hover { width:52px; height:52px; background:rgba(104,191,164,.08); border-color:var(--c300); }
+
+    /* ===== NAV ===== */
+    #nav { position:fixed; top:0; left:0; right:0; z-index:300; padding:24px 48px; display:flex; justify-content:space-between; align-items:center; }
+    .nav-logo { font-size:10px; font-weight:500; letter-spacing:.25em; text-transform:uppercase; color:var(--t2); text-decoration:none; transition:color .3s; pointer-events:all; }
+    .nav-logo:hover { color:var(--c500); }
+    .nav-tag { font-size:10px; font-weight:300; letter-spacing:.15em; color:var(--t3); }
+
+    /* ===== TIMELINE BAR ===== */
+    #tl-bar {
+      position:fixed; top:68px; left:0; right:0; z-index:290;
+      height:64px; background:var(--white);
+      border-bottom:1px solid var(--c100);
+      padding:0 48px;
+      display:flex; align-items:center;
+    }
+    .tl-inner { position:relative; width:100%; display:flex; align-items:center; justify-content:space-between; }
+    .tl-rail { position:absolute; top:50%; left:0; right:0; height:1px; background:var(--c100); z-index:0; }
+    .tl-fill { position:absolute; top:50%; left:0; height:1px; background:var(--c400); z-index:1; width:0%; transition:width .3s ease; }
+    .tl-point {
+      position:relative; z-index:2;
+      display:flex; flex-direction:column; align-items:center; gap:5px;
+      cursor:pointer;
+    }
+    .tl-dot { width:7px; height:7px; border-radius:50%; background:var(--c100); transition:background .3s, transform .25s var(--ease-out); }
+    .tl-lbl { font-size:8.5px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:var(--t3); transition:color .3s; white-space:nowrap; }
+    .tl-point.done .tl-dot  { background:var(--c300); }
+    .tl-point.active .tl-dot { background:var(--c500); transform:scale(1.6); }
+    .tl-point.active .tl-lbl { color:var(--c500); }
+    .tl-point.future .tl-dot { background:var(--c100); opacity:.5; }
+    .tl-point.future .tl-lbl { opacity:.4; cursor:default; }
+    .tl-sublbl { font-size:7.5px; font-weight:400; letter-spacing:.08em; color:var(--t3); white-space:nowrap; transition:color .3s; display:block; }
+    .tl-point.active .tl-sublbl { color:var(--c500); }
+    .tl-point[data-sec]:hover .tl-lbl,
+    .tl-point[data-sec]:hover .tl-sublbl { color:var(--c500); }
+
+    /* ===== SHARED SECTION STYLES ===== */
+    .arc-sec { min-height:100vh; padding:156px 48px 100px; }
+    .sec-week-tag { font-size:9px; font-weight:500; letter-spacing:.35em; text-transform:uppercase; color:var(--c500); display:block; margin-bottom:12px; }
+    .sec-h { font-size:clamp(36px,6vw,72px); font-weight:800; letter-spacing:-0.03em; line-height:1.08; color:var(--t); margin-bottom:60px; }
+
+    /* ===== HERO ===== */
+    #hero {
+      min-height:100vh; padding:148px 48px 88px;
+      display:flex; flex-direction:column; justify-content:flex-end;
+      background:var(--white); border-bottom:1px solid var(--c100);
+      position:relative; overflow:hidden;
+    }
+    .hero-bg-text {
+      position:absolute; right:-20px; top:50%; transform:translateY(-50%);
+      font-size:clamp(120px,22vw,260px); font-weight:900; letter-spacing:-0.06em;
+      color:var(--c50); user-select:none; pointer-events:none; line-height:1;
+    }
+    .hero-eyebrow { font-size:10px; font-weight:400; letter-spacing:.4em; text-transform:uppercase; color:var(--c500); margin-bottom:28px; display:block; }
+    .hero-h1 { font-size:clamp(52px,9vw,108px); font-weight:800; letter-spacing:-0.04em; line-height:1.06; color:var(--t); margin-bottom:36px; position:relative; z-index:1; }
+    .hero-sub { font-size:16px; font-weight:300; line-height:2; color:var(--t2); max-width:420px; position:relative; z-index:1; }
+
+    /* ===== W3: 팀 결성 ===== */
+    #w3 { background:var(--c50); border-top:1px solid var(--c100); }
+    .team-stage {
+      width:100%; height:320px;
+      position:relative; margin-bottom:48px;
+    }
+    /* Small circles — 2×2 grid on left half */
+    .tc {
+      position:absolute; border-radius:50%;
+      background:var(--c100); border:2px solid var(--c400);
+      display:flex; align-items:center; justify-content:center;
+      will-change:transform,opacity;
+    }
+    .tc-name { font-size:13px; font-weight:600; color:var(--t); letter-spacing:-0.01em; pointer-events:none; }
+    .tc-1 { width:82px; height:82px; left:4%;  top:8%;  }
+    .tc-2 { width:82px; height:82px; left:27%; top:8%;  }
+    .tc-3 { width:82px; height:82px; left:4%;  top:54%; }
+    .tc-4 { width:82px; height:82px; left:27%; top:54%; }
+
+    /* Arrow */
+    #tc-arrow {
+      position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+      pointer-events:none;
+    }
+
+    /* Big circle */
+    #tc-big {
+      position:absolute; right:6%; top:50%; transform:translateY(-50%) scale(0);
+      width:190px; height:190px; border-radius:50%;
+      background:var(--c400); opacity:0;
+      display:flex; align-items:center; justify-content:center;
+      will-change:transform,opacity;
+    }
+    .tc-big-text { font-size:48px; font-weight:900; letter-spacing:-0.04em; color:var(--white); }
+
+    .team-desc { font-size:15px; font-weight:400; line-height:2; color:var(--t2); max-width:600px; }
+
+    /* ===== W4: 데스크 리서치 ===== */
+    #w4 { background:var(--white); border-top:1px solid var(--c100); }
+    .research-cards { display:grid; grid-template-columns:1fr 1fr; gap:3px; margin-bottom:48px; }
+    .r-card {
+      aspect-ratio:4/3; background:var(--c50);
+      display:flex; align-items:center; justify-content:center;
+      position:relative; overflow:hidden;
+    }
+    .r-card-inner {
+      width:78%; height:78%;
+      border:1.5px dashed var(--c200);
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+      background:var(--white);
+    }
+    .r-card-tag { font-size:9px; font-weight:500; letter-spacing:.22em; text-transform:uppercase; color:var(--t3); }
+    .r-card-name { font-size:18px; font-weight:600; color:var(--t2); text-align:center; letter-spacing:-0.01em; }
+    .r-card-note { font-size:9px; font-weight:300; letter-spacing:.15em; text-transform:uppercase; color:var(--c300); }
+    .r4-desc { font-size:15px; font-weight:400; line-height:2; color:var(--t2); max-width:600px; }
+
+    /* ===== FLOW CONNECTOR ===== */
+    #flow-connector {
+      position:relative; height:180px;
+      background:var(--white);
+      overflow:visible;
+    }
+    #flow-svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
+    .fp { fill:none; stroke:var(--c300); stroke-width:1.5; stroke-linecap:round; }
+
+    /* ===== W5: 가설 + 세부질문 ===== */
+    #w5 { background:var(--white); padding-top:60px; }
+
+    #hypo-box {
+      max-width:700px; padding:48px 52px;
+      border:1.5px solid var(--c300); position:relative;
+      margin-bottom:3px;
+    }
+    .hypo-tag {
+      position:absolute; top:0; left:40px; transform:translateY(-50%);
+      background:var(--white); padding:0 12px;
+      font-size:9px; font-weight:600; letter-spacing:.25em; text-transform:uppercase; color:var(--c500);
+    }
+    .hypo-text { font-size:18px; font-weight:500; line-height:1.8; letter-spacing:-0.01em; color:var(--t); }
+
+    .sq-list { max-width:700px; display:flex; flex-direction:column; gap:3px; margin-top:0; }
+    .sq-item {
+      padding:26px 32px; background:var(--c50);
+      display:grid; grid-template-columns:40px 1fr; gap:16px; align-items:start;
+    }
+    .sq-num { font-size:10px; font-weight:600; letter-spacing:.1em; color:var(--c400); padding-top:3px; }
+    .sq-text { font-size:15px; font-weight:400; line-height:1.85; color:var(--t2); }
+
+    /* ===== FOOTER ===== */
+    footer { background:var(--dark); padding:48px 48px 40px; }
+    .ft-div { height:1px; background:rgba(140,207,186,.08); margin-bottom:28px; }
+    .ft-row { display:flex; justify-content:space-between; font-size:10px; font-weight:200; letter-spacing:.12em; color:rgba(122,155,142,.35); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width:900px) {
+      #nav, #tl-bar { padding:18px 24px; }
+      .arc-sec, #hero, #w5 { padding-left:24px; padding-right:24px; }
+      #tl-bar { overflow-x:auto; }
+      .tl-sublbl { display:none; }
+      footer { padding:36px 24px 28px; }
+    }
+    @media (max-width:600px) {
+      .research-cards { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a class="nav-logo" href="index.html">← 연대노동조합</a>
+  <span class="nav-tag">작업 아카이브</span>
+</nav>
+
+<!-- TIMELINE BAR -->
+<div id="tl-bar">
+  <div class="tl-inner" id="tl-inner">
+    <div class="tl-rail"></div>
+    <div class="tl-fill" id="tl-fill"></div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-text">AR</div>
+  <span class="hero-eyebrow" id="hero-ey">작업 과정 기록 — 2025</span>
+  <h1 class="hero-h1" id="hero-h1">만들어진<br>것들의 이면</h1>
+  <p class="hero-sub" id="hero-sub">팀 결성부터 최종 결과물까지. 연대노동조합 프로젝트의 모든 주차를 기록합니다.</p>
+</section>
+
+<!-- W3: 팀 결성 -->
+<section id="w3" class="arc-sec" data-week="0">
+  <span class="sec-week-tag" id="w3-tag">W3 — 팀 결성</span>
+  <h2 class="sec-h" id="w3-h">팀 결성</h2>
+
+  <div class="team-stage" id="team-stage">
+    <!-- Small circles (4명) -->
+    <div class="tc tc-1" id="tc-1"><span class="tc-name">지우</span></div>
+    <div class="tc tc-2" id="tc-2"><span class="tc-name">성찬</span></div>
+    <div class="tc tc-3" id="tc-3"><span class="tc-name">연재</span></div>
+    <div class="tc tc-4" id="tc-4"><span class="tc-name">원지</span></div>
+
+    <!-- Arrow -->
+    <div id="tc-arrow">
+      <svg width="60" height="28" viewBox="0 0 60 28" fill="none">
+        <path d="M4 14H52M40 4L56 14L40 24" stroke="var(--c300)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <!-- Big merged circle -->
+    <div id="tc-big">
+      <span class="tc-big-text">연대</span>
+    </div>
+  </div>
+
+  <p class="team-desc" id="w3-desc">네 명이 모여 하나의 팀이 되었습니다. 각자 다른 배경을 가진 우리는 AI 노동 대체라는 공통된 질문 앞에서 연대했습니다.</p>
+</section>
+
+<!-- W4: 데스크 리서치 -->
+<section id="w4" class="arc-sec" data-week="1">
+  <span class="sec-week-tag">W4 — 데스크 리서치</span>
+  <h2 class="sec-h" id="w4-h">데스크 리서치</h2>
+
+  <div class="research-cards">
+    <div class="r-card" id="rc-l">
+      <div class="r-card-inner">
+        <span class="r-card-tag">Research A</span>
+        <span class="r-card-name">사상가 리서치</span>
+        <span class="r-card-note">이미지 추가 예정</span>
+      </div>
+    </div>
+    <div class="r-card" id="rc-r">
+      <div class="r-card-inner">
+        <span class="r-card-tag">Research B</span>
+        <span class="r-card-name">레퍼런스 분석</span>
+        <span class="r-card-note">이미지 추가 예정</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="r4-desc" id="w4-desc">AI와 노동, 인간 연대에 관한 사상가들의 이론을 조사하고 분석했습니다. 이 리서치가 이후 가설 수립의 핵심 재료가 되었습니다.</p>
+</section>
+
+<!-- FLOW CONNECTOR (SVG 경로 — 리서치 → 가설) -->
+<div id="flow-connector">
+  <svg id="flow-svg" viewBox="0 0 1000 180" preserveAspectRatio="none">
+    <!-- Left card → center -->
+    <path id="fp-l" class="fp" d="M 250,0 C 250,90 500,90 500,180"/>
+    <!-- Right card → center -->
+    <path id="fp-r" class="fp" d="M 750,0 C 750,90 500,90 500,180"/>
+  </svg>
+</div>
+
+<!-- W5: 세부질문 + 가설 -->
+<section id="w5" class="arc-sec" data-week="2">
+  <span class="sec-week-tag">W5 — 세부 질문 + 가설 설정</span>
+  <h2 class="sec-h" id="w5-h">가설과 질문</h2>
+
+  <div id="hypo-box">
+    <span class="hypo-tag">가설</span>
+    <p class="hypo-text">AI가 노동을 대체한 사회에서, 인간은 감정·기억·경험을 공유하는 행위를 통해 새로운 형태의 연대와 의미를 만들어낼 수 있다.</p>
+  </div>
+
+  <div class="sq-list" id="sq-list">
+    <div class="sq-item">
+      <span class="sq-num">01</span>
+      <span class="sq-text">AI 대체 이후, 사람들은 어떤 방식으로 소속감과 연대감을 경험하는가?</span>
+    </div>
+    <div class="sq-item">
+      <span class="sq-num">02</span>
+      <span class="sq-text">노동 외의 활동—감정 공유, 기억 전달—에서 의미와 가치를 찾을 수 있는가?</span>
+    </div>
+    <div class="sq-item">
+      <span class="sq-num">03</span>
+      <span class="sq-text">물질적 오브제(생존키트)는 공동체 의식을 강화하는 역할을 할 수 있는가?</span>
+    </div>
+    <div class="sq-item">
+      <span class="sq-num">04</span>
+      <span class="sq-text">AI를 위협이 아닌 공동 양육의 대상으로 재정의할 때, 사회적 합의는 어떻게 형성되는가?</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-div"></div>
+  <div class="ft-row">
+    <span>© 연대노동조합 2047 — Archive</span>
+    <span>시각디자인 UX/UI · Speculative Design</span>
+  </div>
+</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+/* ── CURSOR ── */
+const curDot = document.getElementById('cur-dot');
+const curRing = document.getElementById('cur-ring');
+let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
+addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; gsap.to(curDot,{x:mx,y:my,duration:.08,ease:'none'}); });
+(function loop(){ rx+=(mx-rx)*.1; ry+=(my-ry)*.1; curRing.style.left=rx+'px'; curRing.style.top=ry+'px'; requestAnimationFrame(loop); })();
+document.querySelectorAll('a,.r-card,.sq-item,.tl-point').forEach(el=>{
+  el.addEventListener('mouseenter',()=>curRing.classList.add('is-hover'));
+  el.addEventListener('mouseleave',()=>curRing.classList.remove('is-hover'));
+});
+
+/* ── TIMELINE BUILD ── */
+const weeks = [
+  { label:'W3',    name:'팀 결성',         sec:'w3',   done:true  },
+  { label:'W4',    name:'데스크 리서치',    sec:'w4',   done:true  },
+  { label:'W5',    name:'가설 설정',        sec:'w5',   done:true  },
+  { label:'W6',    name:'필드 리서치',      sec:null,   done:false },
+  { label:'W8',    name:'심층 인터뷰',      sec:null,   done:false },
+  { label:'W10',   name:'조작적 정의',      sec:null,   done:false },
+  { label:'W11-12',name:'기획',            sec:null,   done:false },
+  { label:'W13-14',name:'제작',            sec:null,   done:false },
+  { label:'W15',   name:'완성',            sec:null,   done:false },
+];
+
+const tlInner = document.getElementById('tl-inner');
+const tlFill  = document.getElementById('tl-fill');
+
+weeks.forEach(w => {
+  const pt = document.createElement('div');
+  pt.className = 'tl-point' + (w.sec ? '' : ' future');
+  pt.id = 'tlp-' + w.label.replace('-','');
+  if (w.sec) pt.dataset.sec = w.sec;
+  pt.innerHTML = `<div class="tl-dot"></div>
+    <span class="tl-lbl">${w.label}</span>
+    <span class="tl-sublbl">${w.name}</span>`;
+  if (w.sec) {
+    pt.style.cursor = 'pointer';
+    pt.addEventListener('click', () => document.getElementById(w.sec)?.scrollIntoView({behavior:'smooth'}));
+  }
+  tlInner.appendChild(pt);
+});
+
+function updateTL() {
+  const scrollY = window.scrollY;
+  const total   = document.documentElement.scrollHeight - innerHeight;
+  tlFill.style.width = Math.min(100, scrollY / total * 100) + '%';
+
+  weeks.forEach((w, i) => {
+    const pt = document.getElementById('tlp-' + w.label.replace('-',''));
+    if (!pt || !w.sec) return;
+    const sec = document.getElementById(w.sec);
+    const top = sec?.getBoundingClientRect().top ?? 999;
+    if (top <= 130) { pt.classList.add('active','done'); }
+    else             { pt.classList.remove('active'); }
+  });
+}
+window.addEventListener('scroll', updateTL, {passive:true});
+updateTL();
+
+/* ── HERO ENTRANCE ── */
+gsap.set(['#hero-ey','#hero-h1','#hero-sub'], {opacity:0, y:20});
+gsap.timeline({delay:.15})
+  .to('#hero-ey',  {opacity:1, y:0, duration:.55, ease:'power2.out'})
+  .to('#hero-h1',  {opacity:1, y:0, duration:.85, ease:'power3.out'}, '-=.25')
+  .to('#hero-sub', {opacity:1, y:0, duration:.65, ease:'power2.out'}, '-=.35');
+
+/* ── W3: 팀 결성 CIRCLE MERGE ── */
+const sCircles = ['tc-1','tc-2','tc-3','tc-4'].map(id=>document.getElementById(id));
+const bigC  = document.getElementById('tc-big');
+const arrow = document.getElementById('tc-arrow');
+
+gsap.set(['#w3-tag','#w3-h'], {opacity:0, y:12});
+gsap.set(sCircles, {opacity:0, scale:0});
+gsap.set(bigC,     {opacity:0, scale:0});
+gsap.set(arrow,    {opacity:0});
+gsap.set('#w3-desc', {opacity:0});
+
+ScrollTrigger.create({
+  trigger:'#w3', start:'top 60%', once:true,
+  onEnter() {
+    gsap.timeline()
+      .to(['#w3-tag','#w3-h'], {opacity:1, y:0, duration:.55, stagger:.08, ease:'power2.out'})
+      // circles appear
+      .to(sCircles, {opacity:1, scale:1, duration:.45, stagger:.09, ease:'back.out(2)'}, '-=.1')
+      // arrow
+      .to(arrow,    {opacity:1, duration:.35}, '+=.25')
+      // circles merge right
+      .to(sCircles, {x:280, scale:0, opacity:0, duration:.55, stagger:.04, ease:'power3.in'}, '+=.45')
+      .to(arrow,    {opacity:0, duration:.2}, '-=.45')
+      // big circle
+      .to(bigC, {opacity:1, scale:1, duration:.5, ease:'back.out(2)'}, '-=.15')
+      // desc
+      .to('#w3-desc', {opacity:1, duration:.5}, '+=.2');
+  }
+});
+
+/* ── W4: RESEARCH REVEAL ── */
+gsap.set(['#w4 .sec-week-tag','#w4-h','#rc-l','#rc-r','#w4-desc'], {opacity:0, y:20});
+ScrollTrigger.create({
+  trigger:'#w4', start:'top 65%', once:true,
+  onEnter() {
+    gsap.timeline()
+      .to(['#w4 .sec-week-tag','#w4-h'], {opacity:1, y:0, duration:.55, stagger:.08, ease:'power2.out'})
+      .to('#rc-l',    {opacity:1, y:0, duration:.6, ease:'power3.out'}, '-=.1')
+      .to('#rc-r',    {opacity:1, y:0, duration:.6, ease:'power3.out', delay:.08}, '<')
+      .to('#w4-desc', {opacity:1, y:0, duration:.5}, '-=.1');
+  }
+});
+
+/* ── FLOW PATHS: scrub draw on scroll ── */
+(function setupFlow() {
+  const fpL = document.getElementById('fp-l');
+  const fpR = document.getElementById('fp-r');
+  [fpL, fpR].forEach(p => {
+    const len = p.getTotalLength();
+    gsap.set(p, {strokeDasharray: len, strokeDashoffset: len});
+  });
+
+  // Research cards get a subtle downward pull as paths draw
+  gsap.to(['#rc-l','#rc-r'], {
+    y: 14, ease:'none',
+    scrollTrigger: {
+      trigger:'#flow-connector', start:'top 80%', end:'bottom 30%', scrub:.7
+    }
+  });
+
+  gsap.to([fpL, fpR], {
+    strokeDashoffset: 0,
+    ease:'power1.inOut',
+    stagger:.08,
+    scrollTrigger: {
+      trigger:'#flow-connector', start:'top 80%', end:'bottom 30%', scrub:.7
+    }
+  });
+})();
+
+/* ── W5: HYPOTHESIS REVEAL (triggered when paths finish) ── */
+gsap.set(['#w5 .sec-week-tag','#w5-h','#hypo-box','.sq-item'], {opacity:0, y:16});
+gsap.set('#hypo-box', {scale:.97});
+
+ScrollTrigger.create({
+  trigger:'#w5', start:'top 65%', once:true,
+  onEnter() {
+    gsap.timeline()
+      .to(['#w5 .sec-week-tag','#w5-h'], {opacity:1, y:0, duration:.55, stagger:.08, ease:'power2.out'})
+      // hypothesis box bursts in (pulled-in feel)
+      .to('#hypo-box', {opacity:1, y:0, scale:1, duration:.65, ease:'back.out(1.6)'}, '-=.1')
+      // sub-questions cascade
+      .to('.sq-item', {opacity:1, y:0, duration:.45, stagger:.1, ease:'power2.out'}, '-=.1');
+  }
+});
+</script>
+</body>
+</html>

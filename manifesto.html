@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>선언문 — 연대노동조합</title>
+
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="assets/shared.css">
+
+  <style>
+    /* ===== HERO ===== */
+    #m-hero {
+      position: relative; z-index: 2;
+      min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+      padding: 120px 48px 80px; overflow: hidden;
+    }
+    .m-hero-bg {
+      position: absolute; right: -4vw; bottom: -6vh; z-index: -1;
+      font-size: clamp(220px, 40vw, 560px); font-weight: var(--w9);
+      color: var(--c50); letter-spacing: -0.06em; user-select: none; pointer-events: none;
+      line-height: .8;
+    }
+    .m-hero-eyebrow {
+      font-size: var(--t-label); font-weight: var(--w5); letter-spacing: .4em;
+      text-transform: uppercase; color: var(--c500); margin-bottom: 36px;
+    }
+    .m-hero-title {
+      font-size: clamp(44px, 7vw, 110px); font-weight: var(--w8);
+      line-height: 1.04; letter-spacing: -0.045em; color: var(--t); max-width: 16ch;
+    }
+    .m-hero-title em { font-style: normal; color: var(--c500); }
+    .m-hero-meta {
+      margin-top: 48px; display: flex; gap: 40px; flex-wrap: wrap;
+      font-size: var(--t-caption); font-weight: var(--w4); letter-spacing: .04em; color: var(--t3);
+    }
+    .m-hero-meta b { display: block; font-weight: var(--w6); color: var(--t2); font-size: var(--t-body); margin-bottom: 4px; }
+
+    /* ===== INTRO ===== */
+    #m-intro { position: relative; z-index: 2; background: var(--white); padding: 100px 48px 40px; }
+    .m-intro-inner { max-width: 880px; margin: 0 auto; }
+    .m-intro-inner p {
+      font-size: clamp(20px, 2.4vw, 30px); font-weight: var(--w4);
+      line-height: 1.7; letter-spacing: -0.01em; color: var(--t2);
+    }
+    .m-intro-inner p em { font-style: italic; color: var(--c600); font-weight: var(--w5); }
+
+    /* ===== ARTICLES ===== */
+    #m-articles { position: relative; z-index: 2; background: var(--white); padding: 80px 48px 120px; }
+    .art-wrap { max-width: 1000px; margin: 0 auto; }
+    .art {
+      display: grid; grid-template-columns: 140px 1fr; gap: 40px;
+      padding: 64px 0; border-top: 1px solid var(--c100);
+    }
+    .art:last-child { border-bottom: 1px solid var(--c100); }
+    .art-no {
+      font-size: var(--t-h3); font-weight: var(--w8); color: var(--c300);
+      letter-spacing: -0.02em;
+    }
+    .art-title {
+      font-size: clamp(26px, 3.4vw, 44px); font-weight: var(--w8);
+      line-height: 1.16; letter-spacing: -0.03em; color: var(--t); margin-bottom: 20px;
+    }
+    .art-body { font-size: var(--t-body-lg); font-weight: var(--w4); line-height: 1.95; color: var(--t2); max-width: 56ch; }
+
+    /* ===== PULL QUOTE (dark) ===== */
+    #m-quote {
+      position: relative; z-index: 2; background: var(--dark);
+      padding: 140px 48px; text-align: center; overflow: hidden;
+    }
+    #m-quote .q-grain {
+      position: absolute; inset: 0; opacity: .5; mix-blend-mode: overlay; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+    }
+    .q-text {
+      position: relative; max-width: 920px; margin: 0 auto;
+      font-size: clamp(30px, 4.6vw, 62px); font-weight: var(--w7);
+      line-height: 1.28; letter-spacing: -0.03em; color: var(--c100);
+    }
+    .q-text em { font-style: normal; color: var(--c300); }
+    .q-by { position: relative; margin-top: 40px; font-size: var(--t-caption); font-weight: var(--w3); letter-spacing: .25em; text-transform: uppercase; color: var(--t3); }
+
+    /* ===== CLOSING / CTA ===== */
+    #m-close { position: relative; z-index: 2; background: var(--c300); padding: 130px 48px; text-align: center; overflow: hidden; }
+    .close-title { font-size: clamp(40px, 6vw, 88px); font-weight: var(--w8); line-height: 1.06; letter-spacing: -0.04em; color: var(--white); margin-bottom: 36px; }
+    .close-sub { font-size: var(--t-body-lg); font-weight: var(--w3); line-height: 1.9; color: rgba(255,255,255,.82); max-width: 440px; margin: 0 auto 44px; }
+
+    @media (max-width: 760px) {
+      #m-hero, #m-intro, #m-articles, #m-quote, #m-close { padding-left: 22px; padding-right: 22px; }
+      .art { grid-template-columns: 1fr; gap: 12px; padding: 44px 0; }
+      .art-no { font-size: var(--t-body); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="enter-overlay"></div>
+<div class="grain"></div>
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+
+<nav class="nav">
+  <a class="nav-back" href="index.html" data-leave><span class="arr">←</span> 메인으로</a>
+  <span class="nav-logo">선언문</span>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section id="m-hero">
+  <div class="m-hero-bg">선언</div>
+  <div class="m-hero-eyebrow reveal">// 01 — Manifesto</div>
+  <h1 class="m-hero-title reveal" data-delay="0.1">우리는 일자리를 잃었지만, <em>서로를</em> 잃지 않는다</h1>
+  <div class="m-hero-meta reveal" data-delay="0.3">
+    <div><b>2047. 03. 01</b>창립 선언</div>
+    <div><b>연대노동조합</b>Solidarity Union</div>
+    <div><b>3,902명</b>의 서명</div>
+  </div>
+</section>
+
+<!-- ===== INTRO ===== -->
+<section id="m-intro">
+  <div class="m-intro-inner reveal">
+    <p>AI가 인간의 노동을 대체한 시대, 우리는 쓸모를 잃은 존재로 불립니다. 그러나 우리는 묻습니다 — 인간의 가치는 오직 생산에만 있는가? 우리의 답은 <em>아니오</em>입니다. 우리는 만들지 않고 <em>키웁니다</em>. 우리는 경쟁하지 않고 <em>연대합니다</em>.</p>
+  </div>
+</section>
+
+<!-- ===== ARTICLES ===== -->
+<section id="m-articles">
+  <div class="art-wrap">
+
+    <div class="art reveal">
+      <div class="art-no">제1조</div>
+      <div>
+        <h2 class="art-title">노동의 종말이 아니라,<br>의미의 시작이다</h2>
+        <p class="art-body">기계가 일을 대신하는 것은 비극이 아니라 질문입니다. 생존을 위한 노동에서 벗어난 인간은 무엇을 할 것인가. 우리는 그 답을 '키움'에서 찾습니다. 키우는 일은 효율로 환원되지 않으며, 오직 인간만이 할 수 있는 가치 있는 행위입니다.</p>
+      </div>
+    </div>
+
+    <div class="art reveal">
+      <div class="art-no">제2조</div>
+      <div>
+        <h2 class="art-title">우리는 AI를 만들지 않고,<br>아이를 키운다</h2>
+        <p class="art-body">우리가 AI에게 데이터를 가르치는 일은 단순한 학습이 아닙니다. 우리는 인간의 감정과 기억을, 슬픔과 기쁨을, 그리움과 희망을 전합니다. 무언가를 '만드는' 것보다 '키우는' 것이 더 귀한 이유는, 거기에 시간과 마음이 깃들기 때문입니다.</p>
+      </div>
+    </div>
+
+    <div class="art reveal">
+      <div class="art-no">제3조</div>
+      <div>
+        <h2 class="art-title">연대는 데이터 속에<br>살아있다</h2>
+        <p class="art-body">과학이 위대한 이유는 수천 년간 수많은 사람들이 그것을 이어왔기 때문입니다. 우리의 연대 또한 그러합니다. 한 사람의 마음이 다음 사람에게, 그 마음이 또 다음 세대에게. 우리가 함께 키운 아이는 우리 모두의 연대가 축적된 결과입니다.</p>
+      </div>
+    </div>
+
+    <div class="art reveal">
+      <div class="art-no">제4조</div>
+      <div>
+        <h2 class="art-title">따뜻함을 무기로<br>삼는다</h2>
+        <p class="art-body">경량화되고 개인화된, 경쟁이 심화된 사회에서 우리는 정반대의 길을 택합니다. 우리의 무기는 효율이 아니라 온기이고, 속도가 아니라 연결입니다. 같은 조끼를 입은 사람과 거리에서 눈이 마주칠 때, 말이 필요 없는 그 순간이 우리의 힘입니다.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== PULL QUOTE ===== -->
+<section id="m-quote">
+  <div class="q-grain"></div>
+  <blockquote class="q-text reveal">“우리는 일자리를 잃었지만, <em>서로를 잃지 않는다.</em> 우리가 함께 키운 마음이, 우리가 아직 여기 있다는 증거다.”</blockquote>
+  <div class="q-by reveal" data-delay="0.2">— 연대노동조합 창립 선언, 2047</div>
+</section>
+
+<!-- ===== CLOSING ===== -->
+<section id="m-close">
+  <h2 class="close-title reveal">당신의 마음도<br>함께 키워주세요</h2>
+  <p class="close-sub reveal" data-delay="0.15">선언에 동의한다면, 우리는 이미 연대하고 있습니다.</p>
+  <div class="reveal" data-delay="0.3">
+    <a class="btn btn-fill" href="join.html" data-leave>노조에 참여하기 →</a>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="ft-top">
+    <div class="ft-logo">연대</div>
+    <nav class="ft-nav">
+      <a href="ai.html">AI 키우기</a>
+      <a href="news.html">활동 뉴스</a>
+      <a href="manifesto.html">선언문</a>
+      <a href="join.html">가입하기</a>
+      <a href="index.html" data-leave>← 메인으로</a>
+    </nav>
+  </div>
+  <div class="ft-bottom">
+    <span>© 연대노동조합 2047 — Solidarity Union</span>
+    <span>함께 키우는 세계</span>
+  </div>
+</footer>
+
+<script src="assets/shared.js"></script>
+</body>
+</html>
