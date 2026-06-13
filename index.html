@@ -8,66 +8,58 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 
+  <!-- importmap must come before module scripts -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+    }
+  }
+  </script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
   <style>
     /* ===== DESIGN TOKENS ===== */
     :root {
       --f: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-
       --t-display: clamp(80px, 14vw, 160px);
       --t-h1:      clamp(48px, 7vw, 96px);
       --t-h2:      clamp(28px, 4vw, 56px);
       --t-h3:      clamp(18px, 2.2vw, 28px);
-      --t-body-lg: 17px;
-      --t-body:    15px;
-      --t-caption: 12px;
-      --t-label:   10px;
-
-      --w9: 900; --w8: 800; --w7: 700;
-      --w6: 600; --w5: 500; --w4: 400; --w3: 300; --w2: 200;
-
-      --c50:  #F2FAF7;
-      --c100: #D9F0E8;
-      --c200: #B2E1D1;
-      --c300: #8CCFBA;
-      --c400: #68BFA4;
-      --c500: #46A88C;
-      --c600: #2E8C72;
-      --dark:  #192820;
-      --white: #FAFCFB;
-      --t:     #1A2B24;
-      --t2:    #3D5449;
-      --t3:    #7A9B8E;
-
+      --t-body-lg: 17px; --t-body: 15px; --t-caption: 12px; --t-label: 10px;
+      --w9:900; --w8:800; --w7:700; --w6:600; --w5:500; --w4:400; --w3:300; --w2:200;
+      --c50:#F2FAF7; --c100:#D9F0E8; --c200:#B2E1D1; --c300:#8CCFBA;
+      --c400:#68BFA4; --c500:#46A88C; --c600:#2E8C72;
+      --dark:#192820; --white:#FAFCFB; --t:#1A2B24; --t2:#3D5449; --t3:#7A9B8E;
       --ease-out: cubic-bezier(0.16,1,0.3,1);
       --ease-io:  cubic-bezier(0.76,0,0.24,1);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-family: var(--f); color: var(--t); background: var(--white); cursor: none; overflow-x: hidden; scroll-behavior: smooth; }
-    body { overflow-x: hidden; }
+    html { font-family: var(--f); color: var(--t); background: var(--dark); cursor: none; }
+    body { overflow-x: clip; }
     ::-webkit-scrollbar { width: 3px; }
-    ::-webkit-scrollbar-track { background: var(--c50); }
-    ::-webkit-scrollbar-thumb { background: var(--c300); border-radius: 2px; }
+    ::-webkit-scrollbar-track { background: #0d1710; }
+    ::-webkit-scrollbar-thumb { background: var(--c600); border-radius: 2px; }
 
     /* ===== CURSOR ===== */
     #cur-dot {
       position: fixed; width: 6px; height: 6px; border-radius: 50%;
-      background: var(--c500); pointer-events: none; z-index: 9999;
+      background: var(--c400); pointer-events: none; z-index: 9999;
       transform: translate(-50%,-50%);
     }
     #cur-ring {
       position: fixed; width: 32px; height: 32px; border-radius: 50%;
-      border: 1px solid var(--c400); pointer-events: none; z-index: 9998;
+      border: 1px solid var(--c500); pointer-events: none; z-index: 9998;
       transform: translate(-50%,-50%);
       transition: width .4s var(--ease-out), height .4s var(--ease-out),
-                  background .4s ease, border-color .4s ease;
+                  background .4s, border-color .4s;
     }
     #cur-ring.is-hover { width: 54px; height: 54px; background: rgba(104,191,164,.08); border-color: var(--c300); }
-    #cur-ring.is-vest  { width: 80px; height: 80px; background: rgba(140,207,186,.05); border-color: var(--c200); }
+    #cur-ring.is-model { width: 80px; height: 80px; background: rgba(140,207,186,.04); border-color: rgba(140,207,186,.25); }
 
     /* ===== PRELOADER ===== */
     #preloader {
@@ -85,148 +77,175 @@
       display: flex; justify-content: space-between; align-items: center;
       pointer-events: none;
     }
-    .nav-logo { font-size: var(--t-label); font-weight: var(--w5); letter-spacing: 0.25em; text-transform: uppercase; color: var(--t2); }
-    .nav-tag  { font-size: var(--t-label); font-weight: var(--w3); letter-spacing: 0.15em; color: var(--t3); }
+    .nav-logo { font-size: var(--t-label); font-weight: var(--w5); letter-spacing: 0.25em; text-transform: uppercase; color: var(--c400); }
+    .nav-links { display: flex; gap: 32px; pointer-events: all; }
+    .nav-links a {
+      font-size: var(--t-label); font-weight: var(--w3); letter-spacing: 0.2em;
+      text-transform: uppercase; color: rgba(122,155,142,.6);
+      text-decoration: none; transition: color .3s;
+    }
+    .nav-links a:hover { color: var(--c300); }
 
-    /* ===== HERO ===== */
-    #hero {
-      position: relative; height: 100vh;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      overflow: hidden; background: var(--white);
-    }
-    .hero-bg-word {
-      position: absolute;
-      font-size: clamp(180px, 32vw, 380px); font-weight: var(--w9);
-      color: var(--c100); letter-spacing: -0.05em;
-      user-select: none; pointer-events: none; white-space: nowrap; z-index: 0;
-      will-change: transform;
-    }
-    .hero-label {
-      position: relative; z-index: 2;
-      font-size: var(--t-label); font-weight: var(--w4);
-      letter-spacing: 0.3em; text-transform: uppercase; color: var(--t3);
-      margin-bottom: 24px;
-    }
-    .hero-scroll {
-      position: absolute; bottom: 44px; left: 50%; transform: translateX(-50%);
-      font-size: var(--t-label); font-weight: var(--w3);
-      letter-spacing: 0.3em; text-transform: uppercase; color: var(--t3);
-      z-index: 2;
+    /* ===== ZOOM OVERLAY ===== */
+    #zoom-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--dark); opacity: 0; pointer-events: none;
     }
 
-    /* ===== 3D VEST (model-viewer) ===== */
-    #vest-scene {
-      position: relative; z-index: 1;
-      width: clamp(320px, 42vw, 540px);
-      height: clamp(420px, 56vh, 640px);
-      will-change: transform;
-    }
-    #vest-model {
-      width: 100%; height: 100%;
-      --poster-color: transparent;
-      background: transparent;
-      cursor: grab;
-    }
-    #vest-model::part(default-progress-bar) { display: none; }
-
-    /* ===== SURFACE MARKERS (attached to model parts) ===== */
-    .marker {
+    /* ===== BAG EXPERIENCE ===== */
+    #bag-experience {
       position: relative;
-      width: 18px; height: 18px;
-      cursor: pointer; pointer-events: auto;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--dark);
+    }
+    #bag-experience::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 5; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      background-size: 160px 160px;
+      opacity: 0.07; mix-blend-mode: overlay;
+    }
+    #bag-glow { position: absolute; inset: 0; z-index: 1; pointer-events: none; transition: background 1.4s ease; }
+    #bag-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; display: block; opacity: 0; transition: opacity 1s ease; }
+    #bag-canvas.loaded { opacity: 1; }
+
+    /* Loading */
+    #bag-loading {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      z-index: 8; display: flex; flex-direction: column; align-items: center; gap: 16px;
+      opacity: 0; transition: opacity .5s; pointer-events: none;
+    }
+    #bag-loading.visible { opacity: 1; }
+    .bl-ring { width: 32px; height: 32px; border: 1.5px solid rgba(104,191,164,.2); border-top-color: var(--c400); border-radius: 50%; animation: bl-spin 1s linear infinite; }
+    @keyframes bl-spin { to { transform: rotate(360deg); } }
+    .bl-text { font-size: var(--t-label); letter-spacing: 0.35em; color: var(--t3); text-transform: uppercase; }
+
+    /* ===== CHAPTER PANELS ===== */
+    .bag-chapter {
+      position: absolute;
+      top: 50%;
+      /* CSS standalone translate for vertical centering — GSAP animates transform separately */
+      translate: 0 -50%;
+      width: clamp(260px, 28vw, 400px);
+      padding: 0 8px;
       opacity: 0;
-      transition: opacity .5s ease;
-      --mc: var(--c500);
+      z-index: 10;
+      pointer-events: none;
+      will-change: opacity, transform;
     }
-    #vest-scene.ready .marker { opacity: 1; }
+    .bag-chapter.side-right { right: 4vw; }
+    .bag-chapter.side-left  { left: 4vw; }
+    .bag-chapter.ch-active  { pointer-events: all; }
 
-    /* Core dot */
-    .marker .dot {
-      position: absolute; top: 50%; left: 50%;
-      width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px;
-      border-radius: 50%;
-      background: var(--white);
-      border: 2px solid var(--mc);
-      box-shadow: 0 2px 8px rgba(46,140,114,.3);
-      transition: transform .35s var(--ease-out), background .3s ease;
-      z-index: 2;
+    .bch-index {
+      font-size: var(--t-label); font-weight: var(--w3); letter-spacing: 0.5em;
+      color: var(--c500); margin-bottom: 18px;
+      display: flex; align-items: center; gap: 12px;
     }
-    /* Pulsing ring */
-    .marker .pulse {
-      position: absolute; top: 50%; left: 50%;
-      width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px;
-      border-radius: 50%;
-      border: 1.5px solid var(--mc);
-      animation: marker-pulse 2.4s ease-out infinite;
-      z-index: 1;
+    .bch-index::before { content: ''; width: 28px; height: 1px; background: var(--c600); }
+    .bch-part {
+      font-size: var(--t-caption); font-weight: var(--w3); letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--t3); margin-bottom: 18px;
     }
-    @keyframes marker-pulse {
-      0%   { transform: scale(1);   opacity: .7; }
-      70%  { transform: scale(3.2); opacity: 0; }
-      100% { transform: scale(3.2); opacity: 0; }
+    .bch-title {
+      font-size: clamp(38px, 4.2vw, 68px); font-weight: var(--w9);
+      line-height: 1.0; letter-spacing: -0.04em; color: var(--white); margin-bottom: 20px;
     }
-    /* Connector line + label */
-    .marker .tip {
-      position: absolute; left: 18px; top: 50%;
-      transform: translateY(-50%) translateX(-6px);
-      display: flex; align-items: center; gap: 8px;
-      opacity: 0; pointer-events: none;
-      transition: opacity .35s ease, transform .35s var(--ease-out);
-      white-space: nowrap;
+    .bch-body {
+      font-size: 14px; font-weight: var(--w3); line-height: 1.9;
+      color: rgba(250,252,251,.48); margin-bottom: 32px;
     }
-    .marker .tip::before {
-      content: ''; width: 16px; height: 1px;
-      background: var(--mc); flex: none;
-    }
-    .marker .tip .lbl {
-      background: rgba(250,252,251,.92);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--c300);
+
+    /* CTA buttons */
+    .bch-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 12px 22px;
+      border: 1px solid rgba(104,191,164,.35);
       border-radius: 100px;
-      padding: 7px 15px;
-      font-family: var(--f); font-size: 12px; font-weight: var(--w6);
-      color: var(--t);
-      box-shadow: 0 6px 22px rgba(46,140,114,.18);
+      background: rgba(25,40,32,.5);
+      backdrop-filter: blur(10px);
+      color: var(--c300);
+      font-family: var(--f); font-size: var(--t-label); font-weight: var(--w5);
+      letter-spacing: 0.28em; text-transform: uppercase;
+      cursor: pointer;
+      transition: background .3s, border-color .3s, color .3s, gap .25s, transform .3s var(--ease-out);
     }
-    .marker .tip .lbl .hs-sub { font-weight: var(--w3); font-size: 10px; color: var(--t3); margin-left: 6px; }
-
-    /* Markers whose tip should open to the LEFT */
-    .marker.flip .tip {
-      left: auto; right: 18px;
-      transform: translateY(-50%) translateX(6px);
-      flex-direction: row-reverse;
+    .bch-btn:hover {
+      background: var(--c500); border-color: var(--c500);
+      color: var(--dark); gap: 16px; transform: translateY(-2px);
     }
-    .marker.flip .tip::before { /* keep line */ }
-
-    /* Hover state */
-    .marker:hover .dot { transform: scale(1.5); background: var(--mc); }
-    .marker:hover .tip { opacity: 1; transform: translateY(-50%) translateX(0); }
-    .marker:hover .pulse { animation-play-state: paused; opacity: 0; }
-
-    /* ===== ZIPPER TRANSITION OVERLAY ===== */
-    #zip-overlay {
-      position: fixed; inset: 0; z-index: 9000;
-      pointer-events: none; opacity: 0;
-      background: radial-gradient(circle at var(--zx,50%) var(--zy,50%),
-        rgba(255,255,255,1) 0%, rgba(245,250,248,.96) 35%, rgba(217,240,232,.4) 70%, rgba(178,225,209,0) 100%);
+    .bch-btn .btn-arrow {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 1.5px solid currentColor;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; flex-shrink: 0;
+      transition: transform .3s var(--ease-out);
     }
+    .bch-btn:hover .btn-arrow { transform: rotate(45deg); }
 
-    .vest-hint {
-      text-align: center; margin-top: 8px; position: relative; z-index: 2;
-      font-size: var(--t-label); font-weight: var(--w4);
-      letter-spacing: .25em; text-transform: uppercase; color: var(--t3);
-      transition: opacity .6s ease;
+    /* Progress dots */
+    #bag-dots {
+      position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 30;
     }
-    .vest-hint.gone { opacity: 0; }
+    .b-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: rgba(140,207,186,.18); cursor: pointer;
+      transition: background .4s, height .4s var(--ease-out), border-radius .4s;
+    }
+    .b-dot.active { background: var(--c400); height: 22px; border-radius: 3px; }
+
+    /* Counter */
+    #bag-counter {
+      position: absolute; left: 44px; bottom: 40px; z-index: 20;
+      display: flex; align-items: baseline; gap: 4px; opacity: 0;
+    }
+    #bag-count-cur { font-size: clamp(32px,4vw,52px); font-weight: var(--w9); letter-spacing: -0.04em; color: var(--c400); }
+    .bag-count-sep, .bag-count-total { font-size: var(--t-h3); font-weight: var(--w3); color: rgba(140,207,186,.3); }
+
+    /* Part label */
+    #part-label {
+      position: absolute; top: 84px; left: 50%; transform: translateX(-50%);
+      z-index: 20; pointer-events: none;
+    }
+    .pl-part {
+      display: inline-block;
+      font-size: var(--t-label); font-weight: var(--w4); letter-spacing: 0.35em;
+      text-transform: uppercase; color: rgba(140,207,186,.5);
+      background: rgba(25,40,32,.6); backdrop-filter: blur(12px);
+      border: 1px solid rgba(104,191,164,.12);
+      padding: 8px 18px; border-radius: 100px;
+      opacity: 0; transition: opacity .5s ease;
+    }
+    .pl-part.visible { opacity: 1; }
+
+    /* Scroll cue */
+    #bag-scroll-cue {
+      position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      z-index: 20; opacity: 0; pointer-events: none;
+    }
+    #bag-scroll-cue span { font-size: var(--t-label); font-weight: var(--w3); letter-spacing: 0.38em; text-transform: uppercase; color: rgba(140,207,186,.4); }
+    .bsc-arc { width: 26px; height: 26px; border: 1.5px solid rgba(104,191,164,.35); border-radius: 50%; border-right-color: transparent; animation: arc-spin 2s linear infinite; }
+    @keyframes arc-spin { to { transform: rotate(360deg); } }
+
+    /* Rotation hint */
+    #rotation-hint {
+      position: absolute; bottom: 36px; right: 56px; z-index: 20;
+      display: flex; align-items: center; gap: 8px; opacity: 0; pointer-events: none;
+    }
+    .rh-text { font-size: var(--t-label); font-weight: var(--w3); letter-spacing: 0.28em; color: rgba(140,207,186,.38); }
+    .rh-arc { width: 20px; height: 20px; border: 1.5px solid rgba(104,191,164,.3); border-radius: 50%; border-right-color: transparent; animation: arc-spin 2.2s linear infinite; }
 
     /* ===== TICKER ===== */
-    .ticker { overflow: hidden; background: var(--c400); padding: 13px 0; }
-    .ticker-track { display: flex; width: max-content; animation: scroll-ticker 32s linear infinite; }
+    .ticker { overflow: hidden; background: var(--c500); padding: 12px 0; }
+    .ticker-track { display: flex; width: max-content; animation: scroll-ticker 36s linear infinite; }
     .ticker-track.rev { animation-direction: reverse; }
     .ticker-track span {
       font-size: var(--t-label); font-weight: var(--w4);
       letter-spacing: 0.35em; text-transform: uppercase;
-      color: var(--white); padding-right: 60px; white-space: nowrap;
+      color: rgba(250,252,251,.85); padding-right: 60px; white-space: nowrap;
     }
     @keyframes scroll-ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
@@ -258,9 +277,7 @@
     #ai-section::after {
       content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-      background-size: 180px 180px;
-      opacity: 0.22;
-      mix-blend-mode: multiply;
+      background-size: 180px 180px; opacity: 0.22; mix-blend-mode: multiply;
     }
     .ai-content { position: relative; z-index: 2; text-align: center; padding: 80px 48px; max-width: 720px; }
     .ai-eyebrow { font-size: var(--t-label); font-weight: var(--w4); letter-spacing: 0.4em; text-transform: uppercase; color: var(--t3); display: block; margin-bottom: 36px; }
@@ -270,28 +287,20 @@
       display: inline-block; padding: 15px 48px;
       border: 1px solid var(--c500); color: var(--t);
       text-decoration: none; font-family: var(--f);
-      font-size: var(--t-label); font-weight: var(--w5);
-      letter-spacing: 0.3em; text-transform: uppercase;
-      transition: background .35s ease, color .35s ease;
+      font-size: var(--t-label); font-weight: var(--w5); letter-spacing: 0.3em; text-transform: uppercase;
+      transition: background .35s, color .35s;
     }
     .ai-btn:hover { background: var(--t); color: var(--white); }
 
     /* ===== NEWS ===== */
     #news { padding: 120px 48px; background: var(--c50); }
-    .sec-head {
-      display: flex; justify-content: space-between; align-items: flex-end;
-      padding-bottom: 28px; border-bottom: 1px solid var(--c200); margin-bottom: 48px;
-    }
+    .sec-head { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 28px; border-bottom: 1px solid var(--c200); margin-bottom: 48px; }
     .sec-title { font-size: var(--t-h2); font-weight: var(--w7); letter-spacing: -0.02em; color: var(--t); }
     .sec-all { font-size: var(--t-caption); font-weight: var(--w4); letter-spacing: 0.2em; color: var(--c500); text-decoration: none; transition: color .3s; }
     .sec-all:hover { color: var(--c600); }
     .news-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 3px; }
     .n-card { background: var(--white); padding: 44px 36px; position: relative; overflow: hidden; }
-    .n-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: var(--c300); transform: scaleX(0); transform-origin: left;
-      transition: transform .5s var(--ease-out);
-    }
+    .n-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--c300); transform: scaleX(0); transform-origin: left; transition: transform .5s var(--ease-out); }
     .n-card:hover::before { transform: scaleX(1); }
     .n-date { font-size: var(--t-label); font-weight: var(--w3); letter-spacing: .2em; color: var(--t3); margin-bottom: 12px; }
     .n-tag { display: inline-block; padding: 3px 10px; background: var(--c100); color: var(--c600); font-size: 9px; font-weight: var(--w6); letter-spacing: .15em; text-transform: uppercase; margin-bottom: 18px; }
@@ -300,17 +309,11 @@
 
     /* ===== JOIN ===== */
     #join {
-      position: relative; min-height: 75vh;
-      background: var(--c300);
+      position: relative; min-height: 75vh; background: var(--c300);
       display: flex; align-items: center; justify-content: center;
       text-align: center; padding: 120px 48px; overflow: hidden;
     }
-    .join-bg-num {
-      position: absolute;
-      font-size: clamp(200px, 36vw, 500px); font-weight: var(--w9);
-      color: rgba(255,255,255,.12); letter-spacing: -0.06em;
-      user-select: none; pointer-events: none;
-    }
+    .join-bg-num { position: absolute; font-size: clamp(200px,36vw,500px); font-weight: var(--w9); color: rgba(255,255,255,.12); letter-spacing: -0.06em; user-select: none; pointer-events: none; }
     .join-hl  { font-size: var(--t-h1); font-weight: var(--w8); line-height: 1.08; letter-spacing: -0.04em; color: white; margin-bottom: 28px; position: relative; z-index: 1; }
     .join-sub { font-size: var(--t-body-lg); font-weight: var(--w3); line-height: 2; color: rgba(255,255,255,.8); max-width: 460px; margin: 0 auto 48px; position: relative; z-index: 1; }
     .join-btn {
@@ -319,26 +322,29 @@
       text-decoration: none; font-family: var(--f);
       font-size: var(--t-label); font-weight: var(--w5); letter-spacing: 0.3em; text-transform: uppercase;
       position: relative; z-index: 1;
-      transition: background .35s ease, color .35s ease, transform .35s var(--ease-out);
+      transition: background .35s, color .35s, transform .35s var(--ease-out);
     }
     .join-btn:hover { background: var(--dark); color: var(--c300); transform: translateY(-3px); }
 
     /* ===== FOOTER ===== */
-    footer { background: var(--dark); padding: 72px 48px 36px; }
-    .ft-top { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 56px; border-bottom: 1px solid rgba(140,207,186,.12); margin-bottom: 28px; }
-    .ft-logo { font-size: clamp(44px, 7vw, 88px); font-weight: var(--w9); letter-spacing: -0.04em; color: var(--c300); }
+    footer { background: var(--dark); padding: 72px 48px 36px; border-top: 1px solid rgba(140,207,186,.06); }
+    .ft-top { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 56px; border-bottom: 1px solid rgba(140,207,186,.08); margin-bottom: 28px; }
+    .ft-logo { font-size: clamp(44px,7vw,88px); font-weight: var(--w9); letter-spacing: -0.04em; color: var(--c400); }
     .ft-nav  { display: flex; flex-direction: column; gap: 14px; align-items: flex-end; }
     .ft-nav a { font-size: var(--t-label); font-weight: var(--w3); letter-spacing: .25em; text-transform: uppercase; color: var(--t3); text-decoration: none; transition: color .3s; }
     .ft-nav a:hover { color: var(--c300); }
-    .ft-bottom { display: flex; justify-content: space-between; font-size: var(--t-label); font-weight: var(--w2); letter-spacing: .12em; color: rgba(122,155,142,.4); }
+    .ft-bottom { display: flex; justify-content: space-between; font-size: var(--t-label); font-weight: var(--w2); letter-spacing: .12em; color: rgba(122,155,142,.35); }
 
     @media (max-width: 900px) {
-      #nav { padding: 20px 24px; }
+      #nav { padding: 20px 24px; } .nav-links { display: none; }
+      .bag-chapter { width: calc(100vw - 60px) !important; left: 30px !important; right: auto !important; top: auto !important; bottom: 96px; translate: none; }
+      .bag-chapter.side-right, .bag-chapter.side-left { left: 30px; right: auto; }
+      .bch-title { font-size: clamp(32px,8vw,54px); }
+      #bag-counter { left: 24px; }
       #manifesto, #news, #join { padding: 80px 24px; }
       .m-cols { grid-template-columns: 1fr; gap: 32px; }
       .news-grid { grid-template-columns: 1fr; }
-      .ft-top { flex-direction: column; gap: 36px; }
-      .ft-nav { align-items: flex-start; }
+      .ft-top { flex-direction: column; gap: 36px; } .ft-nav { align-items: flex-start; }
     }
   </style>
 </head>
@@ -354,79 +360,104 @@
 <div id="cur-dot"></div>
 <div id="cur-ring"></div>
 
-<!-- ZIPPER / OPEN TRANSITION OVERLAY -->
-<div id="zip-overlay"></div>
+<!-- ZOOM-IN NAVIGATION OVERLAY -->
+<div id="zoom-overlay"></div>
 
 <!-- NAV -->
 <nav id="nav">
   <span class="nav-logo">연대노동조합 · 2047</span>
-  <span class="nav-tag">함께 키우는 세계</span>
+  <div class="nav-links">
+    <a href="ai.html">AI 키우기</a>
+    <a href="news.html">활동 뉴스</a>
+    <a href="manifesto.html">선언문</a>
+    <a href="join.html">가입하기</a>
+  </div>
 </nav>
 
-<!-- ===== HERO ===== -->
-<section id="hero">
-  <div class="hero-bg-word">연대</div>
-  <p class="hero-label">Solidarity Union — Est. 2047</p>
+<!-- ===== BAG EXPERIENCE ===== -->
+<section id="bag-experience">
+  <div id="bag-glow"></div>
+  <canvas id="bag-canvas"></canvas>
 
-  <!-- 3D VEST -->
-  <div id="vest-scene">
-    <model-viewer
-      id="vest-model"
-      src="vest.glb"
-      alt="연대 생존키트 조끼"
-      camera-controls
-      disable-zoom
-      interaction-prompt="none"
-      camera-orbit="90deg 80deg 142%"
-      min-camera-orbit="auto 55deg auto"
-      max-camera-orbit="auto 105deg auto"
-      field-of-view="30deg"
-      shadow-intensity="0.9"
-      shadow-softness="1"
-      exposure="1.15"
-      environment-image="neutral">
-
-      <!-- Surface markers attached to actual vest parts (front = model +X) -->
-
-      <!-- 가슴 메인 포켓 → AI 키우기 -->
-      <div class="marker" slot="hotspot-ai"
-        data-position="0.17 0.22 0.24" data-normal="1 0 0"
-        data-target="#ai-section" data-action="pocket">
-        <div class="pulse"></div><div class="dot"></div>
-        <div class="tip"><span class="lbl">가슴 포켓 열기<span class="hs-sub">AI 키우기 →</span></span></div>
-      </div>
-
-      <!-- 가슴 대각선 지퍼 풀러 → 활동 뉴스 -->
-      <div class="marker" slot="hotspot-news"
-        data-position="0.18 0.04 0.26" data-normal="1 0 0"
-        data-target="#news" data-action="zip">
-        <div class="pulse"></div><div class="dot"></div>
-        <div class="tip"><span class="lbl">지퍼 내리기<span class="hs-sub">활동 뉴스 →</span></span></div>
-      </div>
-
-      <!-- 좌측 숄더 스트랩 → 선언문 -->
-      <div class="marker" slot="hotspot-manifesto"
-        data-position="0.13 0.37 0.31" data-normal="1 0.1 0.2"
-        data-target="#manifesto" data-action="strap">
-        <div class="pulse"></div><div class="dot"></div>
-        <div class="tip"><span class="lbl">스트랩 당기기<span class="hs-sub">선언문 →</span></span></div>
-      </div>
-
-      <!-- 우측 숄더 스트랩 → 가입하기 (라벨 우측으로) -->
-      <div class="marker" slot="hotspot-join"
-        data-position="0.18 0.37 -0.17" data-normal="1 0.1 -0.2"
-        data-target="#join" data-action="strap">
-        <div class="pulse"></div><div class="dot"></div>
-        <div class="tip"><span class="lbl">스트랩 당기기<span class="hs-sub">가입하기 →</span></span></div>
-      </div>
-    </model-viewer>
+  <div id="bag-loading">
+    <div class="bl-ring"></div>
+    <span class="bl-text">모델 로딩 중</span>
   </div>
-  <p class="vest-hint" id="vest-hint">드래그하여 360° 회전 · 포켓을 눌러 이동</p>
 
-  <p class="hero-scroll">스크롤하여 탐색</p>
+  <!-- Chapter 0 — right side -->
+  <div class="bag-chapter side-right" id="bch-0">
+    <div class="bch-index">01 / 04</div>
+    <div class="bch-part">가슴 메인 포켓</div>
+    <h2 class="bch-title">AI<br>키우기</h2>
+    <p class="bch-body">우리가 함께 키우는 아이. 지금 이 순간에도 수많은 사람들의 감정과 기억이 전해지고 있습니다. 당신의 이야기를 더하세요.</p>
+    <button class="bch-btn" data-href="ai.html">
+      참여하기 <span class="btn-arrow">↗</span>
+    </button>
+  </div>
+
+  <!-- Chapter 1 — left side -->
+  <div class="bag-chapter side-left" id="bch-1">
+    <div class="bch-index">02 / 04</div>
+    <div class="bch-part">측면 지퍼 포켓</div>
+    <h2 class="bch-title">활동<br>뉴스</h2>
+    <p class="bch-body">연대의 현장 기록. 1,200여 명의 구성원과 함께하는 집회, 함께 쌓아가는 연대 행동의 기록들.</p>
+    <button class="bch-btn" data-href="news.html">
+      기록 보기 <span class="btn-arrow">↗</span>
+    </button>
+  </div>
+
+  <!-- Chapter 2 — right side -->
+  <div class="bag-chapter side-right" id="bch-2">
+    <div class="bch-index">03 / 04</div>
+    <div class="bch-part">등판 숄더 스트랩</div>
+    <h2 class="bch-title">선언문</h2>
+    <p class="bch-body">우리는 일자리를 잃었지만, 서로를 잃지 않는다. AI가 자리를 대체한 세계에서 우리가 던지는 질문.</p>
+    <button class="bch-btn" data-href="manifesto.html">
+      읽어보기 <span class="btn-arrow">↗</span>
+    </button>
+  </div>
+
+  <!-- Chapter 3 — left side -->
+  <div class="bag-chapter side-left" id="bch-3">
+    <div class="bch-index">04 / 04</div>
+    <div class="bch-part">오른쪽 어깨 스트랩</div>
+    <h2 class="bch-title">함께<br>키우세요</h2>
+    <p class="bch-body">당신의 감정, 기억, 이야기가 우리 모두의 연대가 됩니다. 지금 노동조합에 합류하세요.</p>
+    <button class="bch-btn" data-href="join.html">
+      노조 가입하기 <span class="btn-arrow">↗</span>
+    </button>
+  </div>
+
+  <!-- UI chrome -->
+  <div id="bag-counter">
+    <span id="bag-count-cur">01</span>
+    <span class="bag-count-sep"> &mdash; </span>
+    <span class="bag-count-total">04</span>
+  </div>
+
+  <div id="bag-dots">
+    <div class="b-dot active" data-i="0"></div>
+    <div class="b-dot" data-i="1"></div>
+    <div class="b-dot" data-i="2"></div>
+    <div class="b-dot" data-i="3"></div>
+  </div>
+
+  <div id="bag-scroll-cue">
+    <span>스크롤하여 회전</span>
+    <div class="bsc-arc"></div>
+  </div>
+
+  <div id="rotation-hint">
+    <span class="rh-text">360&deg; 회전 중</span>
+    <div class="rh-arc"></div>
+  </div>
+
+  <div id="part-label">
+    <span class="pl-part" id="pl-text">가슴 메인 포켓</span>
+  </div>
 </section>
 
-<!-- TICKER 1 -->
+<!-- TICKER -->
 <div class="ticker">
   <div class="ticker-track">
     <span>연대 · SOLIDARITY · 함께 · TOGETHER · AI 키우기 · RAISING AI · 연결 · CONNECTION · 2047 · 키움 · NURTURE · 생존 · SURVIVE · </span>
@@ -434,7 +465,7 @@
   </div>
 </div>
 
-<!-- ===== MANIFESTO ===== -->
+<!-- MANIFESTO -->
 <section id="manifesto">
   <span class="eyebrow">// 01 &mdash; 선언문</span>
   <h2 class="m-headline">
@@ -459,7 +490,7 @@
   </div>
 </div>
 
-<!-- ===== AI SECTION ===== -->
+<!-- AI SECTION -->
 <section id="ai-section">
   <canvas id="ai-canvas"></canvas>
   <div class="ai-content">
@@ -470,7 +501,7 @@
   </div>
 </section>
 
-<!-- ===== NEWS ===== -->
+<!-- NEWS -->
 <section id="news">
   <div class="sec-head">
     <h2 class="sec-title">// 03 &mdash; 활동 뉴스</h2>
@@ -481,7 +512,7 @@
       <div class="n-date">2047. 05. 28</div>
       <div class="n-tag">연대 행동</div>
       <h3 class="n-title">서울 노동광장 공동 집회:<br>"우리는 아직 여기 있다"</h3>
-      <p class="n-text">지난 토요일, 연대노동조합은 서울 노동광장에서 1,200여 명의 구성원과 함께 집회를 진행했습니다. AI 대체 이후의 삶을 살아가는 이들의 목소리를 모았으며, 이번 집회는 단순한 시위를 넘어 서로의 존재를 확인하는 자리가 되었습니다.</p>
+      <p class="n-text">지난 토요일, 연대노동조합은 서울 노동광장에서 1,200여 명의 구성원과 함께 집회를 진행했습니다. AI 대체 이후의 삶을 살아가는 이들의 목소리를 모았습니다.</p>
     </div>
     <div class="n-card">
       <div class="n-date">2047. 05. 12</div>
@@ -498,7 +529,7 @@
   </div>
 </section>
 
-<!-- ===== JOIN ===== -->
+<!-- JOIN -->
 <section id="join">
   <div class="join-bg-num">2047</div>
   <div style="position:relative;z-index:1">
@@ -508,7 +539,7 @@
   </div>
 </section>
 
-<!-- ===== FOOTER ===== -->
+<!-- FOOTER -->
 <footer>
   <div class="ft-top">
     <div class="ft-logo">연대</div>
@@ -520,16 +551,19 @@
     </nav>
   </div>
   <div class="ft-bottom">
-    <span>© 연대노동조합 2047 — Solidarity Union</span>
+    <span>&copy; 연대노동조합 2047 — Solidarity Union</span>
     <span>함께 키우는 세계</span>
   </div>
 </footer>
 
-<script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
 gsap.registerPlugin(ScrollTrigger);
 
-/* ===== CURSOR ===== */
-const curDot = document.getElementById('cur-dot');
+/* ─── CURSOR ─── */
+const curDot  = document.getElementById('cur-dot');
 const curRing = document.getElementById('cur-ring');
 let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
 
@@ -537,379 +571,366 @@ addEventListener('mousemove', e => {
   mx = e.clientX; my = e.clientY;
   gsap.to(curDot, { x: mx, y: my, duration: 0.08, ease: 'none' });
 });
-(function loop(){ rx+=(mx-rx)*.1; ry+=(my-ry)*.1; curRing.style.left=rx+'px'; curRing.style.top=ry+'px'; requestAnimationFrame(loop); })();
+(function ringLoop(){
+  rx += (mx - rx) * 0.1; ry += (my - ry) * 0.1;
+  curRing.style.left = rx + 'px'; curRing.style.top = ry + 'px';
+  requestAnimationFrame(ringLoop);
+})();
 
-document.querySelectorAll('a,.n-card,.ai-btn,.join-btn,.marker').forEach(el=>{
-  el.addEventListener('mouseenter',()=>curRing.classList.add('is-hover'));
-  el.addEventListener('mouseleave',()=>curRing.classList.remove('is-hover'));
+document.querySelectorAll('a, .n-card, .ai-btn, .join-btn, .bch-btn, .b-dot').forEach(el => {
+  el.addEventListener('mouseenter', () => curRing.classList.add('is-hover'));
+  el.addEventListener('mouseleave', () => curRing.classList.remove('is-hover'));
 });
-const vestScene = document.getElementById('vest-scene');
-vestScene.addEventListener('mouseenter',()=>curRing.classList.add('is-vest'));
-vestScene.addEventListener('mouseleave',()=>{curRing.classList.remove('is-vest');curRing.classList.remove('is-hover');});
 
-/* ===== INITIAL STATES ===== */
-gsap.set('.pre-word',   { opacity:0, y:24 });
-gsap.set('.pre-sub',    { opacity:0 });
-gsap.set('#nav',        { opacity:0, y:-10 });
-gsap.set('.hero-bg-word',{ opacity:0 });
-gsap.set('#vest-scene', { opacity:0, scale:0.94 });
-gsap.set('.hero-label', { opacity:0, y:8 });
-gsap.set('.vest-hint',  { opacity:0 });
-gsap.set('.hero-scroll',{ opacity:0 });
-gsap.set('.eyebrow',    { opacity:0, y:10 });
-gsap.set('.wi',         { y:'115%' });
-gsap.set('.m-cols p',   { opacity:0, y:20 });
-gsap.set('.ai-eyebrow', { opacity:0 });
-gsap.set('.ai-hl',      { opacity:0, y:32 });
-gsap.set('.ai-body',    { opacity:0, y:20 });
-gsap.set('.ai-btn',     { opacity:0 });
-gsap.set('.sec-title',  { opacity:0, y:16 });
-gsap.set('.n-card',     { opacity:0, y:28 });
+/* ─── INITIAL STATES ─── */
+gsap.set('.pre-word',       { opacity:0, y:24 });
+gsap.set('.pre-sub',        { opacity:0 });
+gsap.set('#nav',            { opacity:0, y:-10 });
+gsap.set('#bag-scroll-cue', { opacity:0 });
+gsap.set('#bag-counter',    { opacity:0 });
+gsap.set('.eyebrow',        { opacity:0, y:10 });
+gsap.set('.wi',             { y:'115%' });
+gsap.set('.m-cols p',       { opacity:0, y:20 });
+gsap.set('.ai-eyebrow',     { opacity:0 });
+gsap.set('.ai-hl',          { opacity:0, y:32 });
+gsap.set('.ai-body',        { opacity:0, y:20 });
+gsap.set('.ai-btn',         { opacity:0 });
+gsap.set('.sec-title',      { opacity:0, y:16 });
+gsap.set('.n-card',         { opacity:0, y:28 });
 
-/* ===== PRELOADER ===== */
-gsap.timeline({ onComplete(){ document.getElementById('preloader').style.display='none'; } })
-  .to('.pre-word', { opacity:1, y:0, duration:.9, ease:'power3.out' })
-  .to('.pre-sub',  { opacity:1, duration:.6 }, '-=.4')
-  .to('#preloader',{ opacity:0, duration:.9, delay:.9, ease:'power2.inOut' })
-  .to('#nav',      { opacity:1, y:0, duration:.6, ease:'power2.out' }, '-=.3')
-  .to('.hero-bg-word',{ opacity:1, duration:1.2, ease:'power2.out' }, '-=.3')
-  .to('#vest-scene',  { opacity:1, scale:1, duration:1, ease:'power3.out' }, '-=.8')
-  .to('.hero-label',  { opacity:1, y:0, duration:.7, ease:'power2.out' }, '-=.4')
-  .to('.vest-hint',   { opacity:1, duration:.6 }, '-=.3')
-  .to('.hero-scroll', { opacity:1, duration:.6 }, '-=.3')
-  .call(()=>{
-    /* hero parallax on scroll */
-    ScrollTrigger.create({
-      trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1.6,
-      onUpdate(self){
-        const p = self.progress;
-        gsap.set('#vest-scene', { y: -p*90, scale: 1 - p*.08, opacity: 1 - p*.9 });
-        gsap.set('.hero-bg-word', { y: -p*140, opacity: 1 - p*1.2 });
-        gsap.set('.hero-label',   { y: p*40, opacity: 1 - p*3 });
-      }
+/* ─── THREE.JS SETUP ─── */
+const canvas   = document.getElementById('bag-canvas');
+const loading  = document.getElementById('bag-loading');
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled   = true;
+renderer.shadowMap.type      = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace    = THREE.SRGBColorSpace;
+renderer.toneMapping         = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+
+const scene  = new THREE.Scene();
+const CAMERA_Z = 6.0;
+const camera = new THREE.PerspectiveCamera(26, innerWidth / innerHeight, 0.01, 100);
+camera.position.set(0, 0.05, CAMERA_Z);
+
+/* Lighting */
+scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+const keyLight = new THREE.DirectionalLight(0xffffff, 2.4);
+keyLight.position.set(1.8, 3, 3.5); keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(1024, 1024);
+scene.add(keyLight);
+const fillLight = new THREE.DirectionalLight(0xD8EDE8, 0.65);
+fillLight.position.set(-2.5, 0.5, 2); scene.add(fillLight);
+const rimLight = new THREE.DirectionalLight(0xffffff, 0.35);
+rimLight.position.set(0, -1, -3.5); scene.add(rimLight);
+const topLight = new THREE.DirectionalLight(0xB8DFD6, 0.45);
+topLight.position.set(0, 4, -2); scene.add(topLight);
+
+/* Shadow receiver */
+const shadowMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(8, 8),
+  new THREE.ShadowMaterial({ opacity: 0.15 })
+);
+shadowMesh.rotation.x = -Math.PI / 2;
+shadowMesh.position.y = -1.4;
+shadowMesh.receiveShadow = true;
+scene.add(shadowMesh);
+
+function applyMint(model) {
+  model.traverse(child => {
+    if (!child.isMesh) return;
+    const old = child.material;
+    child.material = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(0xB2DECE), roughness: 0.80, metalness: 0.03,
     });
+    child.castShadow = child.receiveShadow = true;
+    if (old) old.dispose();
   });
-
-/* ===== VEST MODEL: surface markers + part interactions ===== */
-const vestModel = document.getElementById('vest-model');
-const vestHint  = document.getElementById('vest-hint');
-const zipOverlay= document.getElementById('zip-overlay');
-
-/* Apply a soft mint tint to every material (model ships untextured/white) */
-function applyMintTint(){
-  try {
-    const mats = (vestModel.model && vestModel.model.materials) || [];
-    if (!mats.length) return false;
-    mats.forEach(m => {
-      const pbr = m.pbrMetallicRoughness;
-      if (!pbr) return;
-      pbr.setBaseColorFactor([0.74, 0.90, 0.84, 1]);   // pale emerald
-      if (pbr.setMetallicFactor)  pbr.setMetallicFactor(0.0);
-      if (pbr.setRoughnessFactor) pbr.setRoughnessFactor(0.85);
-    });
-    return true;
-  } catch (e) { return false; }
 }
 
-vestModel.addEventListener('load', () => {
-  vestScene.classList.add('ready');
-  // materials may not be ready on the exact load tick -> retry briefly
-  if (!applyMintTint()) {
-    const iv = setInterval(() => { if (applyMintTint()) clearInterval(iv); }, 120);
-    setTimeout(() => clearInterval(iv), 4000);
-  }
+let bagModel  = null;
+let initScale = 1;
+const INIT_ROT = Math.PI / 2; /* front face faces camera at currentRot=0 */
+
+/* ─── LOAD MODEL ─── */
+loading.classList.add('visible');
+new GLTFLoader().load('vest.glb', gltf => {
+  const model = gltf.scene;
+  const box    = new THREE.Box3().setFromObject(model);
+  const center = box.getCenter(new THREE.Vector3());
+  const size   = box.getSize(new THREE.Vector3());
+  const scale  = 2.1 / Math.max(size.x, size.y, size.z);
+  initScale = scale;
+  model.scale.setScalar(scale);
+  model.position.copy(center.multiplyScalar(-scale));
+  applyMint(model);
+  scene.add(model);
+  bagModel = model;
+  loading.classList.remove('visible');
+  canvas.classList.add('loaded');
+  canvas.addEventListener('mouseenter', () => curRing.classList.add('is-model'));
+  canvas.addEventListener('mouseleave', () => curRing.classList.remove('is-model'));
+}, undefined, err => {
+  console.error('[vest.glb]', err);
+  loading.classList.remove('visible');
 });
 
-vestModel.addEventListener('camera-change', () => {
-  if (vestHint && !vestHint.classList.contains('gone')) {
-    vestHint.classList.add('gone');
+/* ─── ROTATION STATE ─── */
+let targetRot    = 0;
+let currentRot   = 0;
+let zoomLocked   = false;
+let scrollStarted = false;
+
+/* Wheel → rotate bag; block page scroll */
+document.getElementById('bag-experience').addEventListener('wheel', e => {
+  e.preventDefault();
+  if (zoomLocked) return;
+  targetRot += e.deltaY * 0.003;
+}, { passive: false });
+
+/* Touch support */
+let touchY0 = 0;
+const bagEl = document.getElementById('bag-experience');
+bagEl.addEventListener('touchstart', e => { touchY0 = e.touches[0].clientY; }, { passive: true });
+bagEl.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (zoomLocked) return;
+  const dy = touchY0 - e.touches[0].clientY;
+  touchY0 = e.touches[0].clientY;
+  targetRot += dy * 0.006;
+}, { passive: false });
+
+/* ─── CHAPTER DATA ─── */
+const CHAPTERS = [
+  { num:'01', part:'가슴 메인 포켓',     glow:'radial-gradient(ellipse 55% 65% at 50% 50%, rgba(70,168,140,.15) 0%, transparent 68%)' },
+  { num:'02', part:'측면 지퍼 포켓',     glow:'radial-gradient(ellipse 55% 65% at 50% 50%, rgba(104,191,164,.12) 0%, transparent 68%)' },
+  { num:'03', part:'등판 숄더 스트랩',   glow:'radial-gradient(ellipse 55% 65% at 50% 50%, rgba(140,207,186,.10) 0%, transparent 68%)' },
+  { num:'04', part:'오른쪽 어깨 스트랩', glow:'radial-gradient(ellipse 55% 65% at 50% 50%, rgba(46,140,114,.17) 0%, transparent 68%)' },
+];
+
+const bagGlow     = document.getElementById('bag-glow');
+const plText      = document.getElementById('pl-text');
+const bagCounter  = document.getElementById('bag-counter');
+const bagCountCur = document.getElementById('bag-count-cur');
+const scrollCue   = document.getElementById('bag-scroll-cue');
+const rotHint     = document.getElementById('rotation-hint');
+const chapters    = Array.from(document.querySelectorAll('.bag-chapter'));
+const dots        = Array.from(document.querySelectorAll('.b-dot'));
+
+let activeChapter = -1;
+
+function setChapter(idx) {
+  if (idx === activeChapter) return;
+
+  if (!scrollStarted && Math.abs(currentRot) > 0.08) {
+    scrollStarted = true;
+    gsap.to(scrollCue, { opacity:0, duration:.5 });
+    gsap.to(rotHint,   { opacity:1, duration:.7, delay:.4 });
   }
-}, { once: true });
 
-let transitioning = false;
+  const prevIdx  = activeChapter;
+  activeChapter  = idx;
+  const ch       = CHAPTERS[idx];
+  const isRight  = (idx % 2 === 0);
+  const wasRight = (prevIdx % 2 === 0);
 
-/* Convert a marker's 3D position to screen pixels (for overlay origin) */
-function markerScreenPoint(marker){
-  const rect = marker.getBoundingClientRect();
-  return { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
+  dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+  bagCountCur.textContent = ch.num;
+  gsap.to(bagCounter, { opacity:1, duration:.5, ease:'power2.out' });
+  plText.textContent = ch.part;
+  plText.classList.add('visible');
+  bagGlow.style.background = ch.glow;
+
+  /* Out */
+  if (prevIdx >= 0) {
+    const el = chapters[prevIdx];
+    el.classList.remove('ch-active');
+    gsap.killTweensOf(el);
+    gsap.to(el, { opacity:0, x: wasRight ? 48 : -48, duration:0.32, ease:'power2.in' });
+  }
+
+  /* In — enter from the panel's natural side */
+  const nel = chapters[idx];
+  gsap.killTweensOf(nel);
+  gsap.set(nel, { opacity:0, x: isRight ? 52 : -52 });
+  nel.classList.add('ch-active');
+  gsap.to(nel, { opacity:1, x:0, duration:0.65, ease:'power3.out', delay: prevIdx >= 0 ? 0.08 : 0 });
 }
 
-/* Dynamically point each marker's label INWARD (toward screen centre),
-   so it never runs off the viewport edge. Re-evaluated continuously
-   so it stays correct while the model rotates. */
-const allMarkers = Array.from(document.querySelectorAll('.marker'));
-function updateMarkerLabelSides(){
-  const mid = window.innerWidth / 2;
-  for (const m of allMarkers){
-    const r = m.getBoundingClientRect();
-    if (r.width === 0) continue;
-    const cx = r.left + r.width/2;
-    // marker on right half -> open label to the LEFT (.flip); else to the RIGHT
-    m.classList.toggle('flip', cx > mid);
-  }
-}
-gsap.ticker.add(updateMarkerLabelSides);
-
-/* marker target -> detail page */
-const PAGE_MAP = {
-  '#ai-section': 'ai.html',
-  '#news':       'news.html',
-  '#manifesto':  'manifesto.html',
-  '#join':       'join.html'
-};
-
-/* The signature "open" transition: dolly the camera toward the part,
-   bloom white light from the part, then travel into the detail page. */
-async function openPart(marker){
-  if (transitioning) return;
-  transitioning = true;
-
-  const target = marker.dataset.target;
-  const action = marker.dataset.action;
-  const pos    = marker.dataset.position;     // "x y z"
-  const sec    = document.querySelector(target);
-
-  // overlay bloom origin = marker screen position
-  const pt = markerScreenPoint(marker);
-  zipOverlay.style.setProperty('--zx', pt.x + 'px');
-  zipOverlay.style.setProperty('--zy', pt.y + 'px');
-
-  // 1) camera dollies toward the clicked part (cameraTarget -> part, radius shrinks)
-  const startOrbit  = vestModel.getCameraOrbit().toString();
-  vestModel.cameraTarget = pos.split(' ').map(n=>n+'m').join(' ');
-
-  // action-specific camera move
-  const theta = action === 'strap' ? '90deg' : '90deg';
-  const phi   = action === 'zip'   ? '92deg' : '80deg';
-  vestModel.cameraOrbit = `${theta} ${phi} 78%`;   // zoom in
-
-  // 2) white light blooms from the part (light "opening" / passing through)
-  gsap.killTweensOf(zipOverlay);
-  gsap.fromTo(zipOverlay,
-    { opacity: 0 },
-    { opacity: 1, duration: .62, ease: 'power2.in' });
-
-  // small lift + fade of the whole hero for momentum
-  gsap.to('#vest-scene', { scale: 1.06, duration: .6, ease: 'power2.in' });
-
-  await new Promise(r => setTimeout(r, 620));
-
-  // 3) travel into the detail page — it fades its own white overlay away on load
-  const page = PAGE_MAP[target];
-  if (page) { location.href = page; return; }
-
-  // (fallback) no mapped page -> scroll to in-page section
-  sec?.scrollIntoView({ behavior: 'auto' });
-  gsap.to(zipOverlay, { opacity: 0, duration: .7, ease: 'power2.out' });
-  vestModel.cameraTarget = 'auto auto auto';
-  vestModel.cameraOrbit  = '90deg 80deg 142%';
-  gsap.set('#vest-scene', { scale: 1 });
-  lastUserInteract = Date.now();
-  autoTheta = null;
-  setTimeout(()=>{ transitioning = false; }, 700);
-}
-
-document.querySelectorAll('.marker').forEach(marker => {
-  marker.addEventListener('click', () => openPart(marker));
-});
-
-/* ===== IDLE AUTO-ROTATION (resumes when user is idle) ===== */
-let lastUserInteract = Date.now();
-let modelDragging = false;
-let autoTheta = null;            // current idle azimuth (deg), null = sync from camera
-const IDLE_DELAY = 2600;         // ms of stillness before spin resumes
-const IDLE_SPEED = 0.045;        // deg per frame (~2.7°/s)
-
-vestModel.addEventListener('camera-change', (e) => {
-  if (e.detail && e.detail.source === 'user-interaction') {
-    lastUserInteract = Date.now();
-    autoTheta = null;            // re-sync from wherever the user left it
-  }
-});
-vestModel.addEventListener('pointerdown', () => { modelDragging = true; });
-addEventListener('pointerup', () => { modelDragging = false; lastUserInteract = Date.now(); });
-
+/* ─── RENDER LOOP ─── */
+gsap.ticker.lagSmoothing(0);
 gsap.ticker.add(() => {
-  if (transitioning || modelDragging) return;
-  if (Date.now() - lastUserInteract < IDLE_DELAY) { autoTheta = null; return; }
-  const o = vestModel.getCameraOrbit();
-  if (autoTheta === null) autoTheta = o.theta * 180 / Math.PI;
-  autoTheta += IDLE_SPEED;
-  const phiDeg = (o.phi * 180 / Math.PI).toFixed(2);
-  vestModel.cameraOrbit = `${autoTheta.toFixed(2)}deg ${phiDeg}deg 142%`;
-  vestModel.jumpCameraToGoal();   // apply immediately each frame for steady spin
+  currentRot += (targetRot - currentRot) * 0.065;
+  if (bagModel) bagModel.rotation.y = currentRot + INIT_ROT;
+  renderer.render(scene, camera);
+
+  const face = ((Math.round(currentRot / (Math.PI / 2)) % 4) + 4) % 4;
+  setChapter(face);
 });
 
-/* hero bg parallax on mouse move */
-const hero = document.getElementById('hero');
-hero.addEventListener('mousemove', e => {
-  const r = hero.getBoundingClientRect();
-  const xP = (e.clientX - r.left)/r.width  - .5;
-  const yP = (e.clientY - r.top) /r.height - .5;
-  gsap.to('.hero-bg-word', { x: xP*-28, y: yP*-14, duration:1.2, ease:'power2.out' });
-});
-hero.addEventListener('mouseleave', ()=>{
-  gsap.to('.hero-bg-word', { x:0, y:0, duration:1.2, ease:'power3.out' });
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 });
 
-/* ===== SECTION PARALLAX TRANSITIONS ===== */
-gsap.utils.toArray(['#manifesto', '#ai-section', '#news', '#join']).forEach(sec => {
-  gsap.from(sec, {
-    y: 60,
-    scrollTrigger: { trigger: sec, start: 'top 100%', end: 'top 0%', scrub: 1.4 }
+/* ─── ZOOM-IN NAVIGATION ─── */
+const zoomOverlay = document.getElementById('zoom-overlay');
+
+function navigateZoom(url) {
+  if (zoomLocked) return;
+  zoomLocked = true;
+
+  gsap.to(camera.position, { z: camera.position.z - 5.2, duration:0.85, ease:'power3.in' });
+
+  if (bagModel) {
+    gsap.to(bagModel.scale, {
+      x: bagModel.scale.x * 5, y: bagModel.scale.y * 5, z: bagModel.scale.z * 5,
+      duration:0.85, ease:'power3.in',
+    });
+  }
+
+  gsap.to(zoomOverlay, {
+    opacity:1, duration:0.38, delay:0.52, ease:'power2.in',
+    onComplete: () => { window.location.href = url; },
   });
+}
+
+/* Restore state when user navigates back via bfcache */
+addEventListener('pageshow', e => {
+  if (e.persisted) {
+    gsap.set(zoomOverlay, { opacity:0 });
+    zoomLocked = false;
+    camera.position.z = CAMERA_Z;
+    if (bagModel) bagModel.scale.setScalar(initScale);
+  }
 });
 
-/* Manifesto word reveal */
-const wInners = gsap.utils.toArray('.wi');
-const mTl = gsap.timeline({ paused: true });
-mTl.to(wInners, { y:0, duration:1, stagger:.09, ease:'power4.out' });
+/* Button click → zoom → navigate */
+document.querySelectorAll('.bch-btn').forEach(btn => {
+  btn.addEventListener('click', () => navigateZoom(btn.dataset.href));
+});
 
+/* Dot click → snap rotation to that face */
+dots.forEach((dot, i) => {
+  dot.addEventListener('click', () => { targetRot = i * (Math.PI / 2); });
+});
+
+/* ─── PRELOADER ─── */
+function initExp() {
+  chapters.forEach((el, i) => {
+    gsap.set(el, { opacity:0, x: i % 2 === 0 ? 52 : -52 });
+  });
+  setChapter(0);
+}
+
+gsap.timeline({ onComplete() {
+  document.getElementById('preloader').style.display = 'none';
+  initExp();
+}})
+  .to('.pre-word',       { opacity:1, y:0, duration:.9, ease:'power3.out' })
+  .to('.pre-sub',        { opacity:1, duration:.6 }, '-=.4')
+  .to('#preloader',      { opacity:0, duration:.7, delay:.5, ease:'power2.inOut' })
+  .to('#nav',            { opacity:1, y:0, duration:.6, ease:'power2.out' }, '-=.3')
+  .to('#bag-scroll-cue', { opacity:1, duration:.8 }, '-=.2');
+
+/* ─── SECTION REVEALS (below bag) ─── */
 ScrollTrigger.create({
   trigger: '#manifesto', start: 'top 65%', once: true,
-  onEnter(){
+  onEnter() {
     gsap.to('.eyebrow', { opacity:1, y:0, duration:.6, ease:'power2.out' });
-    mTl.play();
+    gsap.to(gsap.utils.toArray('.wi'), { y:0, duration:1, stagger:.08, ease:'power4.out', delay:.1 });
     gsap.to('.m-cols p', { opacity:1, y:0, duration:.8, stagger:.15, delay:.8, ease:'power2.out' });
   }
 });
+gsap.to('.m-headline', { y:-50, scrollTrigger:{ trigger:'#manifesto', start:'top bottom', end:'bottom top', scrub:1 } });
 
-gsap.to('.m-headline', {
-  y: -50,
-  scrollTrigger: { trigger: '#manifesto', start: 'top bottom', end: 'bottom top', scrub: 1 }
-});
-
-/* AI section reveals */
 ScrollTrigger.create({
   trigger: '#ai-section', start: 'top 60%', once: true,
-  onEnter(){
+  onEnter() {
     gsap.to('.ai-eyebrow', { opacity:1, duration:.6 });
     gsap.to('.ai-hl',  { opacity:1, y:0, duration:1, delay:.2, ease:'power3.out' });
     gsap.to('.ai-body',{ opacity:1, y:0, duration:.8, delay:.5, ease:'power2.out' });
     gsap.to('.ai-btn', { opacity:1, duration:.6, delay:.8 });
   }
 });
+gsap.to('.ai-content', { y:-40, scrollTrigger:{ trigger:'#ai-section', start:'top bottom', end:'bottom top', scrub:1.2 } });
 
-gsap.to('.ai-content', {
-  y: -40,
-  scrollTrigger: { trigger: '#ai-section', start: 'top bottom', end: 'bottom top', scrub: 1.2 }
-});
-
-/* News */
 ScrollTrigger.create({
   trigger: '#news', start: 'top 70%', once: true,
-  onEnter(){
+  onEnter() {
     gsap.to('.sec-title', { opacity:1, y:0, duration:.7 });
-    gsap.to('.n-card', { opacity:1, y:0, duration:.7, stagger:.12, delay:.2, ease:'power2.out' });
+    gsap.to('.n-card', { opacity:1, y:0, duration:.7, stagger:.1, delay:.2, ease:'power2.out' });
   }
 });
 
-/* Join */
 ScrollTrigger.create({
   trigger: '#join', start: 'top 65%', once: true,
-  onEnter(){
+  onEnter() {
     gsap.from('.join-hl',  { y:52, opacity:0, duration:1.1, ease:'power3.out' });
     gsap.from('.join-sub', { y:32, opacity:0, duration:.8, delay:.25, ease:'power2.out' });
     gsap.from('.join-btn', { y:22, opacity:0, duration:.6, delay:.45, ease:'power2.out' });
   }
 });
 
-/* ===== RIPPLE LIGHT CANVAS (AI child) ===== */
-const canvas = document.getElementById('ai-canvas');
-const ctx    = canvas.getContext('2d');
-
-new ResizeObserver(()=>{
-  if(canvas.offsetWidth>0 && canvas.offsetHeight>0){
-    canvas.width  = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+/* ─── AI RIPPLE CANVAS ─── */
+const aiCanvas = document.getElementById('ai-canvas');
+const ctx      = aiCanvas.getContext('2d');
+new ResizeObserver(() => {
+  if (aiCanvas.offsetWidth > 0 && aiCanvas.offsetHeight > 0) {
+    aiCanvas.width = aiCanvas.offsetWidth; aiCanvas.height = aiCanvas.offsetHeight;
   }
-}).observe(canvas);
+}).observe(aiCanvas);
 
-function wavyRing(cx, cy, r, alpha, t, phase) {
+function wavyRing(cx, cy, r, alpha, t, ph) {
   if (r <= 2) return;
-  const N = 180;
   ctx.beginPath();
-  for (let i = 0; i <= N; i++) {
-    const a  = (i / N) * Math.PI * 2;
-    const w  = Math.sin(a*7 + t*.0038 + phase) * r*.034
-             + Math.cos(a*5 - t*.0028 + phase + 1) * r*.021
-             + Math.sin(a*11+ t*.006  + phase*1.3)* r*.01;
+  for (let i = 0; i <= 180; i++) {
+    const a = (i / 180) * Math.PI * 2;
+    const w = Math.sin(a*7+t*.0038+ph)*r*.034 + Math.cos(a*5-t*.0028+ph+1)*r*.021 + Math.sin(a*11+t*.006+ph*1.3)*r*.01;
     const rr = r + w;
-    const x  = cx + Math.cos(a) * rr;
-    const y  = cy + Math.sin(a) * rr;
-    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    i === 0 ? ctx.moveTo(cx+Math.cos(a)*rr, cy+Math.sin(a)*rr)
+            : ctx.lineTo(cx+Math.cos(a)*rr, cy+Math.sin(a)*rr);
   }
   ctx.closePath();
-  ctx.strokeStyle = `rgba(120,195,175,${alpha})`;
-  ctx.lineWidth   = 1.4;
-  ctx.stroke();
-  ctx.fillStyle   = `rgba(255,255,255,${alpha * .28})`;
-  ctx.fill();
+  ctx.strokeStyle = `rgba(120,195,175,${alpha})`; ctx.lineWidth = 1.4; ctx.stroke();
+  ctx.fillStyle = `rgba(255,255,255,${alpha*.28})`; ctx.fill();
 }
 
 function lightRay(cx, cy, angle, len, wid, alpha, t, ph) {
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(angle + Math.sin(t*.0004+ph)*.06);
-  const a  = alpha * (.6 + Math.sin(t*.0007+ph)*.4);
-  const tw = wid * (.65 + Math.sin(t*.0006+ph)*.2);
-  const rg = ctx.createLinearGradient(0, 0, 0, len);
-  rg.addColorStop(0,   `rgba(255,255,255,${a*1.6})`);
-  rg.addColorStop(.25, `rgba(255,255,255,${a})`);
-  rg.addColorStop(.7,  `rgba(235,250,246,${a*.4})`);
-  rg.addColorStop(1,   `rgba(210,242,236,0)`);
-  ctx.fillStyle = rg;
-  ctx.beginPath();
-  ctx.moveTo(-tw/2, 0);
-  ctx.lineTo( tw/2, 0);
-  ctx.lineTo( tw*.08, len);
-  ctx.lineTo(-tw*.08, len);
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
+  ctx.save(); ctx.translate(cx,cy); ctx.rotate(angle+Math.sin(t*.0004+ph)*.06);
+  const a=alpha*(.6+Math.sin(t*.0007+ph)*.4), tw=wid*(.65+Math.sin(t*.0006+ph)*.2);
+  const rg=ctx.createLinearGradient(0,0,0,len);
+  rg.addColorStop(0,`rgba(255,255,255,${a*1.6})`); rg.addColorStop(.25,`rgba(255,255,255,${a})`);
+  rg.addColorStop(.7,`rgba(235,250,246,${a*.4})`); rg.addColorStop(1,`rgba(210,242,236,0)`);
+  ctx.fillStyle=rg; ctx.beginPath();
+  ctx.moveTo(-tw/2,0); ctx.lineTo(tw/2,0); ctx.lineTo(tw*.08,len); ctx.lineTo(-tw*.08,len);
+  ctx.closePath(); ctx.fill(); ctx.restore();
 }
 
 function ripple(t) {
-  const W = canvas.width, H = canvas.height;
-  if (!W || !H) { requestAnimationFrame(ripple); return; }
-
-  ctx.clearRect(0, 0, W, H);
-  ctx.fillStyle = '#F5FAF8';
-  ctx.fillRect(0, 0, W, H);
-
-  const cx = W/2, cy = H/2;
-  const maxR = Math.sqrt(cx*cx + cy*cy) * 1.1;
-
-  const pR = maxR * (.52 + Math.sin(t*.0009)*.06);
-  const cg = ctx.createRadialGradient(cx,cy,0, cx,cy,pR);
-  cg.addColorStop(0,   'rgba(255,255,255,1)');
-  cg.addColorStop(.12, 'rgba(255,255,255,.97)');
-  cg.addColorStop(.3,  'rgba(242,252,249,.82)');
-  cg.addColorStop(.55, 'rgba(220,244,238,.5)');
-  cg.addColorStop(.8,  'rgba(195,235,226,.18)');
-  cg.addColorStop(1,   'rgba(170,222,212,0)');
-  ctx.fillStyle = cg;
-  ctx.beginPath();
-  ctx.arc(cx, cy, pR, 0, Math.PI*2);
-  ctx.fill();
-
-  const nRays = 6;
-  for (let i = 0; i < nRays; i++) {
-    const angle = (Math.PI*2 / nRays) * i + t*.00015;
-    lightRay(cx, cy, angle, maxR, maxR*.18, .06, t, i*1.1);
-  }
-
-  const nRings = 8;
-  for (let i = 0; i < nRings; i++) {
-    const prog  = ((t * .00038 + i/nRings) % 1);
-    const r     = prog * maxR;
-    const alpha = Math.sin(prog * Math.PI) * .13;
-    wavyRing(cx, cy, r, alpha, t, i * .78);
-  }
-
+  const W=aiCanvas.width, H=aiCanvas.height;
+  if (!W||!H){requestAnimationFrame(ripple);return;}
+  ctx.clearRect(0,0,W,H); ctx.fillStyle='#F5FAF8'; ctx.fillRect(0,0,W,H);
+  const cx=W/2,cy=H/2,maxR=Math.sqrt(cx*cx+cy*cy)*1.1;
+  const pR=maxR*(.52+Math.sin(t*.0009)*.06);
+  const cg=ctx.createRadialGradient(cx,cy,0,cx,cy,pR);
+  cg.addColorStop(0,'rgba(255,255,255,1)'); cg.addColorStop(.12,'rgba(255,255,255,.97)');
+  cg.addColorStop(.3,'rgba(242,252,249,.82)'); cg.addColorStop(.55,'rgba(220,244,238,.5)');
+  cg.addColorStop(.8,'rgba(195,235,226,.18)'); cg.addColorStop(1,'rgba(170,222,212,0)');
+  ctx.fillStyle=cg; ctx.beginPath(); ctx.arc(cx,cy,pR,0,Math.PI*2); ctx.fill();
+  for(let i=0;i<6;i++) lightRay(cx,cy,(Math.PI*2/6)*i+t*.00015,maxR,maxR*.18,.06,t,i*1.1);
+  for(let i=0;i<8;i++){const p=((t*.00038+i/8)%1);wavyRing(cx,cy,p*maxR,Math.sin(p*Math.PI)*.13,t,i*.78);}
   requestAnimationFrame(ripple);
 }
 requestAnimationFrame(ripple);
+
+/* Expose for debug */
+window._resetBag = () => { targetRot=0; currentRot=0; scrollStarted=false; activeChapter=-1; initExp(); };
 </script>
 </body>
 </html>
