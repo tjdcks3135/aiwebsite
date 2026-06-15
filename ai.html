@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI 키우기 — 연대노동조합</title>
+  <title>AI-I Human Labor Union — AI 키우기</title>
 
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
@@ -108,6 +108,17 @@
       transition: color .25s, padding-left .35s var(--ease-out);
     }
     .sp-link:hover { color: var(--c300); padding-left: 12px; }
+
+    /* ===== NAV ===== */
+    #nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 42px 48px 30px; display: flex; justify-content: flex-end; align-items: center;
+      background: rgba(25,40,32,.55); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(140,207,186,.12);
+      pointer-events: none;
+    }
+    #nav > * { pointer-events: auto; }
+    .nav-logo { font-size: var(--t-label); font-weight: 500; letter-spacing: .25em; text-transform: uppercase; color: var(--t3); }
 
     /* ===== HERO ===== */
     #child {
@@ -287,7 +298,8 @@
     /* ===== FOOTER ===== */
     .footer { background: #0d1710; padding: 60px 48px 40px; border-top: 1px solid rgba(104,191,164,.08); }
     .ft-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 48px; flex-wrap: wrap; gap: 24px; }
-    .ft-logo { font-size: 28px; font-weight: var(--w8); letter-spacing: -0.04em; color: var(--c300); }
+    .ft-logo { font-size: 28px; font-weight: var(--w8); letter-spacing: -0.04em; color: var(--c300); display: flex; align-items: center; gap: .4em; }
+    .ft-logo-mark { width: auto; height: 58px; }
     .ft-nav { display: flex; gap: 28px; flex-wrap: wrap; }
     .ft-nav a { font-size: var(--t-body); font-weight: var(--w4); color: var(--t3); text-decoration: none; transition: color .25s; }
     .ft-nav a:hover { color: var(--c300); }
@@ -315,11 +327,11 @@
 </button>
 <div id="panel-backdrop"></div>
 <div id="side-panel">
-  <p class="sp-label">연대노동조합 · 2047</p>
+  <p class="sp-label">연대노동조합 · 2031</p>
   <nav>
     <a href="index.html" class="sp-link">메인</a>
     <a href="ai.html" class="sp-link">AI 키우기</a>
-    <a href="news.html" class="sp-link">활동 뉴스</a>
+    <a href="community.html" class="sp-link">커뮤니티</a>
     <a href="manifesto.html" class="sp-link">선언문</a>
     <a href="join.html" class="sp-link">가입하기</a>
   </nav>
@@ -394,17 +406,19 @@
 <!-- ===== FOOTER ===== -->
 <footer class="footer">
   <div class="ft-top">
-    <div class="ft-logo">연대</div>
+    <div class="ft-logo">
+      <img class="ft-logo-mark" src="logo.png" alt="AI-I Human Labor Union 로고" />
+    </div>
     <nav class="ft-nav">
       <a href="ai.html">AI 키우기</a>
-      <a href="community.html">활동 뉴스</a>
+      <a href="community.html">커뮤니티</a>
       <a href="manifesto.html">선언문</a>
       <a href="join.html">가입하기</a>
       <a href="index.html">← 메인으로</a>
     </nav>
   </div>
   <div class="ft-bottom">
-    <span>© 연대노동조합 2047 — Solidarity Union</span>
+    <span>© 연대노동조합 2031 — Solidarity Union</span>
     <span>함께 키우는 세계</span>
   </div>
 </footer>

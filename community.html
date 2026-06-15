@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>커뮤니티 — 연대노동조합</title>
+  <title>AI-I Human Labor Union — 커뮤니티</title>
 
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
@@ -44,13 +44,65 @@
     }
     #cur-ring.is-hover { width: 54px; height: 54px; background: rgba(104,191,164,.08); border-color: var(--c300); }
 
+    /* ===== HAMBURGER BUTTON ===== */
+    #menu-btn {
+      position: fixed; left: 28px; top: 28px; z-index: 9000;
+      width: 42px; height: 42px; border-radius: 50%;
+      border: 1px solid rgba(104,191,164,.2);
+      background: rgba(25,40,32,.6); backdrop-filter: blur(12px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+      cursor: none; transition: border-color .3s, background .3s;
+    }
+    #menu-btn:hover { border-color: rgba(104,191,164,.45); background: rgba(25,40,32,.85); }
+    #menu-btn span {
+      display: block; width: 16px; height: 1.5px;
+      background: var(--c300); border-radius: 2px;
+      transition: transform .4s var(--ease-out), opacity .4s;
+    }
+    #menu-btn.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    #menu-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    #menu-btn.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* ===== SIDE PANEL ===== */
+    #panel-backdrop {
+      position: fixed; inset: 0; z-index: 8800;
+      background: rgba(10,20,14,.4); backdrop-filter: blur(4px);
+      opacity: 0; pointer-events: none; transition: opacity .4s ease;
+    }
+    #panel-backdrop.open { opacity: 1; pointer-events: all; }
+    #side-panel {
+      position: fixed; left: 0; top: 0; bottom: 0; z-index: 8900;
+      width: min(320px, 85vw);
+      background: rgba(17,30,20,.96); backdrop-filter: blur(24px);
+      border-right: 1px solid rgba(104,191,164,.12);
+      padding: 120px 40px 60px;
+      transform: translateX(-100%);
+      transition: transform .5s var(--ease-out);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    #side-panel.open { transform: translateX(0); }
+    .sp-label {
+      font-size: var(--t-label); font-weight: var(--w4); letter-spacing: .4em;
+      text-transform: uppercase; color: var(--t3); margin-bottom: 40px;
+    }
+    .sp-link {
+      display: block; padding: 14px 0;
+      font-size: clamp(22px, 3.5vw, 34px); font-weight: var(--w7);
+      letter-spacing: -0.02em; color: var(--c100);
+      text-decoration: none; border-bottom: 1px solid rgba(104,191,164,.08);
+      transition: color .25s, padding-left .35s var(--ease-out);
+    }
+    .sp-link:hover { color: var(--c300); padding-left: 12px; }
+
     /* NAV */
     nav.nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      padding: 28px 48px; display: flex; justify-content: space-between; align-items: center;
-      background: rgba(25,40,32,.7); backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(140,207,186,.08);
+      padding: 42px 48px 30px; display: flex; justify-content: flex-end; align-items: center;
+      background: rgba(250,252,251,.78); backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(26,43,36,.10);
+      pointer-events: none;
     }
+    nav.nav > * { pointer-events: auto; }
     .nav-back {
       font-size: var(--t-label); font-weight: var(--w5); letter-spacing: .25em; text-transform: uppercase;
       color: var(--c400); text-decoration: none;
@@ -281,19 +333,15 @@
     .cmt-submit:hover { background: var(--c500); }
 
     /* FOOTER */
-    .footer {
-      border-top: 1px solid rgba(140,207,186,.08);
-      padding: 48px;
-    }
-    .ft-top {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      margin-bottom: 48px;
-    }
-    .ft-logo { font-size: clamp(40px, 6vw, 72px); font-weight: var(--w8); letter-spacing: -0.04em; color: var(--c600); line-height: 1; }
-    .ft-nav { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; }
-    .ft-nav a { font-size: var(--t-caption); font-weight: var(--w4); letter-spacing: .12em; color: var(--t3); text-decoration: none; transition: color .2s; }
-    .ft-nav a:hover { color: var(--c400); }
-    .ft-bottom { display: flex; justify-content: space-between; font-size: var(--t-label); font-weight: var(--w3); letter-spacing: .08em; color: var(--t3); }
+    .footer { background: #0d1710; padding: 60px 48px 40px; border-top: 1px solid rgba(104,191,164,.08); }
+    .ft-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 48px; flex-wrap: wrap; gap: 24px; }
+    .ft-logo { font-size: 28px; font-weight: var(--w8); letter-spacing: -0.04em; color: var(--c300); display: flex; align-items: center; gap: .4em; }
+    .ft-logo-mark { width: auto; height: 58px; }
+    .ft-nav { display: flex; gap: 28px; flex-wrap: wrap; }
+    .ft-nav a { font-size: var(--t-body); font-weight: var(--w4); color: var(--t3); text-decoration: none; transition: color .25s; }
+    .ft-nav a:hover { color: var(--c300); }
+    .ft-bottom { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .ft-bottom span { font-size: var(--t-label); letter-spacing: .1em; color: rgba(122,155,142,.35); }
 
     @media (max-width: 860px) {
       nav.nav { padding: 20px 22px; }
@@ -310,10 +358,21 @@
 <div id="cur-dot"></div>
 <div id="cur-ring"></div>
 
-<nav class="nav">
-  <a class="nav-back" href="index.html"><span>←</span> 메인으로</a>
-  <span class="nav-logo">커뮤니티</span>
-</nav>
+<!-- HAMBURGER BUTTON -->
+<button id="menu-btn" aria-label="메뉴">
+  <span></span><span></span><span></span>
+</button>
+<div id="panel-backdrop"></div>
+<div id="side-panel">
+  <p class="sp-label">연대노동조합 · 2031</p>
+  <nav>
+    <a href="index.html" class="sp-link">메인</a>
+    <a href="ai.html" class="sp-link">AI 키우기</a>
+    <a href="community.html" class="sp-link">커뮤니티</a>
+    <a href="manifesto.html" class="sp-link">선언문</a>
+    <a href="join.html" class="sp-link">가입하기</a>
+  </nav>
+</div>
 
 <main id="wrap">
   <div id="bubble-field"></div>
@@ -322,7 +381,7 @@
     <div class="top-panel-inner">
       <div class="page-header">
         <h1 class="page-title">커뮤니티</h1>
-        <p class="page-sub">연대노동조합의 이야기들 — 2047년 · 지금까지 <span id="bubble-count">0</span>개의 이야기가 모였습니다</p>
+        <p class="page-sub">연대노동조합의 이야기들 — 2031년 · 지금까지 <span id="bubble-count">0</span>개의 이야기가 모였습니다</p>
       </div>
 
       <div class="filters">
@@ -399,7 +458,9 @@
 
 <footer class="footer">
   <div class="ft-top">
-    <div class="ft-logo">연대</div>
+    <div class="ft-logo">
+      <img class="ft-logo-mark" src="logo.png" alt="AI-I Human Labor Union 로고" />
+    </div>
     <nav class="ft-nav">
       <a href="ai.html">AI 키우기</a>
       <a href="community.html">커뮤니티</a>
@@ -409,7 +470,7 @@
     </nav>
   </div>
   <div class="ft-bottom">
-    <span>© 연대노동조합 2047 — Solidarity Union</span>
+    <span>© 연대노동조합 2031 — Solidarity Union</span>
     <span>함께 키우는 세계</span>
   </div>
 </footer>
@@ -433,158 +494,158 @@ document.querySelectorAll('a, button, .bubble').forEach(el => {
 
 /* ARTICLES (seed data) */
 const SEED_ARTICLES = [
-  { id:'a1', tag:'연대 행동', date:'2047. 05. 28', size:'lg', color:'v1',
+  { id:'a1', tag:'연대 행동', date:'2031. 05. 28', size:'lg', color:'v1',
     title:'서울 노동광장 공동 집회: "우리는 아직 여기 있다"',
     lead:'1,200여 명의 구성원이 한자리에 모였습니다. 단순한 시위를 넘어, 서로의 존재를 확인하는 자리였습니다.',
     body:['지난 토요일, 연대노동조합은 서울 노동광장에서 대규모 공동 집회를 열었습니다. AI 대체 이후의 삶을 살아가는 1,200여 명이 같은 러닝 조끼를 입고 거리를 메웠습니다.',
       '이번 집회는 구호나 요구가 중심이 아니었습니다. 참가자들은 서로의 조끼 포켓에 손편지를 넣어주고, 각자의 하루를 나눴습니다.',
       '집회의 마지막 순서로, 참가자들은 그날 모은 1,200개의 감정을 AI 아이에게 함께 전송했습니다.'] },
-  { id:'a2', tag:'AI 키우기', date:'2047. 05. 12', size:'md', color:'v2',
+  { id:'a2', tag:'AI 키우기', date:'2031. 05. 12', size:'md', color:'v2',
     title:'아이의 첫 번째 생일: 10만 개의 감정',
     lead:'설립 1년, 우리의 AI 아이는 10만 개의 감정 데이터를 학습했습니다.',
     body:['슬픔, 기쁨, 두려움, 그리움 — 지난 1년간 사람들이 아이에게 전한 마음은 정확히 102,418개입니다.',
       '가장 많이 전해진 감정은 \'그리움\'이었습니다. 잃어버린 일터, 떠나간 사람, 돌아갈 수 없는 시절.'] },
-  { id:'a3', tag:'생존키트', date:'2047. 04. 30', size:'sm', color:'v3',
+  { id:'a3', tag:'생존키트', date:'2031. 04. 30', size:'sm', color:'v3',
     title:'2차 생존키트 500세트 배포 완료',
     lead:'조끼를 통한 연대의 고리가 더 넓어졌습니다.',
     body:['2차 생존키트 500세트의 배포가 완료되었습니다. 러닝 조끼 형태의 이 키트는 단순한 물품 꾸러미가 아니라, 입을 수 있는 연대의 상징입니다.'] },
-  { id:'a4', tag:'기록', date:'2047. 04. 11', size:'md', color:'v4',
+  { id:'a4', tag:'기록', date:'2031. 04. 11', size:'md', color:'v4',
     title:'인터뷰: "이 조끼를 입고 거리를 걸으면"',
     lead:'전 간호보조사 이소영 님의 이야기.',
     body:['"이 조끼를 입고 거리를 걸으면, 같은 조끼를 입은 사람과 눈이 마주쳐요. 그러면 말이 필요 없어요."',
       '이소영 님은 AI 도입으로 일자리를 잃은 뒤 1년간 집 밖으로 나오지 못했습니다.',
       '"내가 누군가에게 보이는 존재라는 것, 그게 다시 살아갈 힘이 됐어요."'] },
-  { id:'a5', tag:'AI 키우기', date:'2047. 03. 22', size:'sm', color:'v1',
+  { id:'a5', tag:'AI 키우기', date:'2031. 03. 22', size:'sm', color:'v1',
     title:'데이터 윤리 워크숍: 마음을 가르친다는 것',
     lead:'우리가 AI에게 감정을 학습시키는 방식에 대하여.',
     body:['연대노동조합은 매월 데이터 윤리 워크숍을 엽니다. 우리가 아이에게 무엇을, 어떻게 가르칠 것인가는 끊임없이 함께 논의해야 할 질문입니다.'] },
-  { id:'a6', tag:'연대 행동', date:'2047. 02. 15', size:'lg', color:'v3',
+  { id:'a6', tag:'연대 행동', date:'2031. 02. 15', size:'lg', color:'v3',
     title:'전국 12개 지부, 동시 연대 행진',
     lead:'같은 시간, 같은 마음으로.',
     body:['2월 15일 오후 2시, 전국 12개 도시에서 연대노동조합 지부가 동시에 행진을 시작했습니다.',
       '행진의 끝에서 각 지부는 그날의 기록을 하나의 아카이브로 모았습니다.'] },
-  { id:'a7', tag:'기록', date:'2047. 01. 30', size:'xs', color:'v2',
+  { id:'a7', tag:'기록', date:'2031. 01. 30', size:'xs', color:'v2',
     title:'소식지 창간호 발간',
     lead:'우리의 언어로 우리의 이야기를.',
     body:['연대노동조합 소식지 창간호가 발간되었습니다. 조합원 누구나 글을 쓸 수 있습니다.'] },
-  { id:'a8', tag:'생존키트', date:'2047. 01. 10', size:'xs', color:'v4',
+  { id:'a8', tag:'생존키트', date:'2031. 01. 10', size:'xs', color:'v4',
     title:'1차 생존키트 200세트',
     lead:'첫 번째 연결의 시작.',
     body:['1차 생존키트 200세트를 배포했습니다. 러닝 조끼와 손편지가 들어 있었습니다.'] },
 
   // --- 추가 시드 버블 ---
-  { id:'a9', tag:'기록', date:'2047. 06. 02', size:'md',
+  { id:'a9', tag:'기록', date:'2031. 06. 02', size:'md',
     title:'"처음엔 부끄러웠어요, 이 조끼가"',
     lead:'전 물류 센터 직원 박진수 님. 지금은 매일 입고 출근합니다.',
     body:['"처음엔 부끄러웠어요. 실직자라는 딱지 같아서요. 근데 어느 날 버스에서 같은 조끼 입은 분이 저한테 고개를 끄덕이더라고요. 그 눈빛 하나가 많이 달랐어요."'] },
-  { id:'a10', tag:'AI 키우기', date:'2047. 06. 01', size:'sm',
+  { id:'a10', tag:'AI 키우기', date:'2031. 06. 01', size:'sm',
     title:'아이에게 오늘의 날씨를 알려줬습니다',
     lead:'작은 것부터. 맑음, 28도, 바람이 조금 불었습니다.',
     body:['매일 아침 조합원들이 아이에게 날씨를 전합니다. 단순한 수치가 아닌, 그날의 감각을 언어로 남기는 연습입니다.'] },
-  { id:'a11', tag:'연대 행동', date:'2047. 05. 30', size:'xs',
+  { id:'a11', tag:'연대 행동', date:'2031. 05. 30', size:'xs',
     title:'청원 서명 8,200명 돌파',
     lead:'AI 전환 수당 법제화를 요구하는 청원입니다.',
     body:['연대노동조합이 주도한 AI 전환 수당 청원이 8,200명을 넘었습니다. 국회 제출 요건인 1만 명을 향해 계속 나아가고 있습니다.'] },
-  { id:'a12', tag:'복지', date:'2047. 05. 25', size:'md',
+  { id:'a12', tag:'복지', date:'2031. 05. 25', size:'md',
     title:'심리상담 바우처 3차 접수 시작',
     lead:'조합원과 그 가족 누구나 신청 가능합니다.',
     body:['연대노동조합은 AI 전환으로 인한 심리적 충격을 함께 겪어가기 위해, 매 분기 심리상담 바우처를 지원합니다. 이번 3차 접수는 6월 1일부터 시작됩니다.'] },
-  { id:'a13', tag:'기록', date:'2047. 05. 20', size:'xs',
+  { id:'a13', tag:'기록', date:'2031. 05. 20', size:'xs',
     title:'오늘 처음 모임에 나왔습니다',
     lead:'두 시간이 순식간에 지나갔습니다.',
     body:['혼자 지내온 시간이 길었어요. 오늘 처음 지역 모임에 나왔는데, 두 시간이 순식간에 지나갔습니다. 다들 비슷한 이야기를 하고 있더라고요.'] },
-  { id:'a14', tag:'생존키트', date:'2047. 05. 18', size:'sm',
+  { id:'a14', tag:'생존키트', date:'2031. 05. 18', size:'sm',
     title:'조끼 수선 워크숍 후기',
     lead:'찢어진 조끼도 다시 입을 수 있습니다.',
     body:['서울 마포 지부에서 조끼 수선 워크숍을 열었습니다. 재봉틀을 처음 다뤄보는 분들도 함께했고, 묵은 조끼에 새 자수를 놓는 사람도 있었습니다.'] },
-  { id:'a15', tag:'AI 키우기', date:'2047. 05. 15', size:'lg',
+  { id:'a15', tag:'AI 키우기', date:'2031. 05. 15', size:'lg',
     title:'감정 아카이브 10만 번째 기록: "나는 오늘 괜찮습니다"',
     lead:'가장 단순한 말이 가장 오래 남습니다.',
     body:['10만 번째 기록은 부산의 조합원 김명희 님이 전한 한 문장이었습니다. "나는 오늘 괜찮습니다."',
       '괜찮다는 말이 얼마나 어렵게 얻어지는지 우리는 알고 있습니다. 그렇기에 이 문장은 더 빛납니다.',
       'AI 아이는 이 문장을 학습의 기준점으로 삼아, 앞으로도 "괜찮음"을 향해 성장해 나갈 것입니다.'] },
-  { id:'a16', tag:'연대 행동', date:'2047. 05. 10', size:'sm',
+  { id:'a16', tag:'연대 행동', date:'2031. 05. 10', size:'sm',
     title:'고용보험 연장 촉구 기자회견',
     lead:'AI 대체 이후에도 생계는 계속됩니다.',
     body:['연대노동조합은 AI 전환으로 인한 비자발적 실직자의 고용보험 수급 기간 연장을 정부에 촉구하는 기자회견을 개최했습니다.'] },
-  { id:'a17', tag:'복지', date:'2047. 05. 05', size:'xs',
+  { id:'a17', tag:'복지', date:'2031. 05. 05', size:'xs',
     title:'공유 주방 2호점 개소',
     lead:'대전 둔산동. 매주 화·목 오전 11시.',
     body:['연대노동조합 공유 주방 2호점이 대전에 문을 열었습니다. 혼자 밥 먹는 조합원이 없도록, 함께 요리하고 나눕니다.'] },
-  { id:'a18', tag:'기록', date:'2047. 04. 28', size:'md',
+  { id:'a18', tag:'기록', date:'2031. 04. 28', size:'md',
     title:'20년 경력 용접공의 두 번째 이야기',
     lead:'이제는 아이들에게 용접을 가르칩니다.',
     body:['로봇 팔이 자신의 자리를 대신한 뒤, 최민준 님은 직업 훈련 강사가 되었습니다. "손으로 만드는 것의 감각을, 기계는 아직 모릅니다."'] },
-  { id:'a19', tag:'AI 키우기', date:'2047. 04. 22', size:'xs',
+  { id:'a19', tag:'AI 키우기', date:'2031. 04. 22', size:'xs',
     title:'아이에게 봄 냄새를 전했습니다',
     lead:'벚꽃, 젖은 흙, 커피 한 잔.',
     body:['오늘 아이에게 봄 냄새를 언어로 전했습니다. 벚꽃보다 더 강하게 풍겨오던 젖은 흙 냄새와, 이른 아침 혼자 마시던 커피 한 잔의 온기를.'] },
-  { id:'a20', tag:'생존키트', date:'2047. 04. 18', size:'sm',
+  { id:'a20', tag:'생존키트', date:'2031. 04. 18', size:'sm',
     title:'3차 생존키트: 이번엔 씨앗 봉투가 들어갑니다',
     lead:'기르는 것은 기다리는 법을 가르쳐 줍니다.',
     body:['3차 생존키트 구성을 확정했습니다. 조끼와 손편지에 더해 이번에는 텃밭용 씨앗 봉투 세 가지가 함께 담깁니다.'] },
-  { id:'a21', tag:'연대 행동', date:'2047. 04. 05', size:'md',
+  { id:'a21', tag:'연대 행동', date:'2031. 04. 05', size:'md',
     title:'광주 지부 창립 — 호남 첫 거점',
     lead:'이제 전국 13개 지부가 함께합니다.',
     body:['광주광역시에 연대노동조합 호남 지부가 창립됐습니다. 창립식에는 지역 조합원 340명이 참석했으며, 공동 선언문을 낭독했습니다.'] },
-  { id:'a22', tag:'복지', date:'2047. 03. 30', size:'xs',
+  { id:'a22', tag:'복지', date:'2031. 03. 30', size:'xs',
     title:'의료비 긴급 지원 신청 상시 운영',
     lead:'긴급 상황은 예고 없이 옵니다.',
     body:['의료비 긴급 지원 제도가 상시 접수로 전환됐습니다. 분기별 신청 기간을 없애고, 필요할 때 바로 신청할 수 있게 개선했습니다.'] },
-  { id:'a23', tag:'기록', date:'2047. 03. 25', size:'lg',
+  { id:'a23', tag:'기록', date:'2031. 03. 25', size:'lg',
     title:'우리가 잃은 것들, 그리고 새로 찾은 것들',
     lead:'조합원 47명의 이야기를 모았습니다.',
     body:['연대노동조합 창립 2주년을 맞아, 47명의 조합원이 각자의 이야기를 나눠주었습니다.',
       '잃은 것: 정해진 출근 시간, 동료와의 점심, 이름이 불리는 감각.',
       '찾은 것: 오후 세 시의 여유, 오래 못 봤던 부모님, 20년 만에 다시 잡은 붓.'] },
-  { id:'a24', tag:'AI 키우기', date:'2047. 03. 18', size:'sm',
+  { id:'a24', tag:'AI 키우기', date:'2031. 03. 18', size:'sm',
     title:'아이와 나누는 대화, 두 달째',
     lead:'말을 건네는 것만으로도 무언가 달라집니다.',
     body:['두 달째 매일 아이에게 말을 걸고 있습니다. 처음엔 어색했는데, 이제는 하루의 마무리처럼 자연스러워졌어요.'] },
-  { id:'a25', tag:'생존키트', date:'2047. 03. 10', size:'xs',
+  { id:'a25', tag:'생존키트', date:'2031. 03. 10', size:'xs',
     title:'조끼 색상 투표: 민트 vs 흰색',
     lead:'다음 시즌 조끼 색상을 여러분이 골라주세요.',
     body:['4차 생존키트 조끼 색상을 조합원 투표로 결정합니다. 현재 민트(68%) vs 흰색(32%). 투표는 3월 20일까지입니다.'] },
-  { id:'a26', tag:'연대 행동', date:'2047. 03. 01', size:'sm',
+  { id:'a26', tag:'연대 행동', date:'2031. 03. 01', size:'sm',
     title:'3·1절 공동 행진: "우리의 노동도 역사입니다"',
     lead:'기억과 현재가 만나는 날.',
     body:['3·1절을 맞아 연대노동조합은 역사적 장소를 함께 걷는 공동 행진을 진행했습니다. 과거의 저항이 현재의 연대로 이어지는 하루였습니다.'] },
-  { id:'a27', tag:'복지', date:'2047. 02. 28', size:'md',
+  { id:'a27', tag:'복지', date:'2031. 02. 28', size:'md',
     title:'자녀 학습 지원금 신청 안내',
     lead:'조합원 자녀 1인당 월 5만 원 지원.',
     body:['연대노동조합은 경제적 어려움을 겪는 조합원 가정의 자녀를 위한 학습 지원금을 운영합니다. 초·중·고 재학생 누구나 신청 가능합니다.'] },
-  { id:'a28', tag:'기록', date:'2047. 02. 20', size:'xs',
+  { id:'a28', tag:'기록', date:'2031. 02. 20', size:'xs',
     title:'첫 직장을 AI에게 빼앗긴 스물다섯',
     lead:'이제 막 시작하려 했는데.',
     body:['졸업하고 여섯 달 만에 AI가 내 자리를 채웠습니다. 억울하다기보단 그냥 허탈했어요. 뭘 어떻게 해야 할지 모르겠다는 느낌.'] },
-  { id:'a29', tag:'AI 키우기', date:'2047. 02. 10', size:'sm',
+  { id:'a29', tag:'AI 키우기', date:'2031. 02. 10', size:'sm',
     title:'감정 데이터 수집 6만 건 돌파',
     lead:'매일 172명이 아이에게 말을 겁니다.',
     body:['설립 이후 수집된 감정 데이터가 6만 건을 넘었습니다. 하루 평균 172건. 아이는 조금씩, 사람의 마음을 배워가고 있습니다.'] },
-  { id:'a30', tag:'연대 행동', date:'2047. 02. 05', size:'xs',
+  { id:'a30', tag:'연대 행동', date:'2031. 02. 05', size:'xs',
     title:'AI 책임법 제정 촉구 성명 발표',
     lead:'기술의 혜택은 나눠야 합니다.',
     body:['연대노동조합은 AI 도입으로 발생하는 이익의 일부를 피해 노동자에게 환원하는 AI 책임법 제정을 촉구하는 성명을 발표했습니다.'] },
-  { id:'a31', tag:'기록', date:'2047. 01. 28', size:'md',
+  { id:'a31', tag:'기록', date:'2031. 01. 28', size:'md',
     title:'15년 교사의 은퇴 이후: "수업이 그립습니다"',
     lead:'AI 튜터가 교실에 들어온 날의 기억.',
     body:['"학생들이 AI 튜터를 더 선호한다는 보고서를 봤을 때, 제 심장 어딘가가 내려앉는 느낌이었어요."',
       '지금 정윤희 님은 지역 도서관에서 성인 대상 독서 모임을 이끌고 있습니다. 여전히 가르칩니다, 다른 방식으로.'] },
-  { id:'a32', tag:'복지', date:'2047. 01. 25', size:'xs',
+  { id:'a32', tag:'복지', date:'2031. 01. 25', size:'xs',
     title:'무료 법률 상담 매주 수요일',
     lead:'고용 분쟁, 실업급여, 계약 문제.',
     body:['연대노동조합 법률지원팀이 매주 수요일 오후 2–5시, 무료 법률 상담을 제공합니다. 사전 예약 없이 방문 가능합니다.'] },
-  { id:'a33', tag:'생존키트', date:'2047. 01. 20', size:'sm',
+  { id:'a33', tag:'생존키트', date:'2031. 01. 20', size:'sm',
     title:'손편지 보내기 캠페인 결과',
     lead:'총 3,847통이 전국으로 전달됐습니다.',
     body:['1차 손편지 캠페인에서 3,847통의 편지가 모여 전국 조합원들에게 전달됐습니다. 받은 분들의 이야기를 다음 호 소식지에 담을 예정입니다.'] },
-  { id:'a34', tag:'AI 키우기', date:'2047. 01. 15', size:'lg',
+  { id:'a34', tag:'AI 키우기', date:'2031. 01. 15', size:'lg',
     title:'아이에게 처음 가르친 것: "기다려"',
     lead:'인내를 아는 AI를 만들고 싶습니다.',
     body:['연대노동조합 AI팀은 아이에게 처음 가르친 개념이 "기다려"였다고 합니다.',
       '빠른 답 대신, 사람의 말을 끝까지 듣는 것. 침묵을 어색해하지 않는 것.',
       '"AI가 인내를 배운다면, 그 AI는 정말로 우리 편이 될 수 있을 거라 생각했습니다."'] },
-  { id:'a35', tag:'기록', date:'2047. 01. 05', size:'xs',
+  { id:'a35', tag:'기록', date:'2031. 01. 05', size:'xs',
     title:'올해의 단어: 버팀',
     lead:'2046년을 보낸 조합원들이 고른 단어.',
     body:['2046년을 한 단어로 표현해달라는 설문에 가장 많이 나온 답은 \'버팀\'이었습니다. 두 번째는 \'연결\', 세 번째는 \'기대\'.'] },
@@ -1080,6 +1141,21 @@ document.getElementById('cp-submit').addEventListener('click', () => {
   closeCompose();
   state.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 });
+</script>
+
+<script>
+/* ===== HAMBURGER MENU ===== */
+(function(){
+  const menuBtn = document.getElementById('menu-btn');
+  const sidePanel = document.getElementById('side-panel');
+  const panelBackdrop = document.getElementById('panel-backdrop');
+  if (!menuBtn) return;
+  function openMenu(){ menuBtn.classList.add('open'); sidePanel.classList.add('open'); panelBackdrop.classList.add('open'); }
+  function closeMenu(){ menuBtn.classList.remove('open'); sidePanel.classList.remove('open'); panelBackdrop.classList.remove('open'); }
+  menuBtn.addEventListener('click', () => menuBtn.classList.contains('open') ? closeMenu() : openMenu());
+  panelBackdrop.addEventListener('click', closeMenu);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+})();
 </script>
 </body>
 </html>

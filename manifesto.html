@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>선언문 — 연대노동조합</title>
+  <title>AI-I Human Labor Union — 선언문</title>
 
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
@@ -67,6 +67,56 @@
     }
     #cur-ring.is-hover { width: 54px; height: 54px; background: rgba(104,191,164,.08); border-color: var(--c300); }
 
+    /* ===== HAMBURGER BUTTON ===== */
+    #menu-btn {
+      position: fixed; left: 28px; top: 28px; z-index: 9000;
+      width: 42px; height: 42px; border-radius: 50%;
+      border: 1px solid rgba(104,191,164,.2);
+      background: rgba(25,40,32,.6); backdrop-filter: blur(12px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+      cursor: none; transition: border-color .3s, background .3s;
+    }
+    #menu-btn:hover { border-color: rgba(104,191,164,.45); background: rgba(25,40,32,.85); }
+    #menu-btn span {
+      display: block; width: 16px; height: 1.5px;
+      background: var(--c300); border-radius: 2px;
+      transition: transform .4s var(--ease-out), opacity .4s;
+    }
+    #menu-btn.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    #menu-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    #menu-btn.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* ===== SIDE PANEL ===== */
+    #panel-backdrop {
+      position: fixed; inset: 0; z-index: 8800;
+      background: rgba(10,20,14,.4); backdrop-filter: blur(4px);
+      opacity: 0; pointer-events: none; transition: opacity .4s ease;
+    }
+    #panel-backdrop.open { opacity: 1; pointer-events: all; }
+    #side-panel {
+      position: fixed; left: 0; top: 0; bottom: 0; z-index: 8900;
+      width: min(320px, 85vw);
+      background: rgba(17,30,20,.96); backdrop-filter: blur(24px);
+      border-right: 1px solid rgba(104,191,164,.12);
+      padding: 120px 40px 60px;
+      transform: translateX(-100%);
+      transition: transform .5s var(--ease-out);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    #side-panel.open { transform: translateX(0); }
+    .sp-label {
+      font-size: var(--t-label); font-weight: var(--w4); letter-spacing: .4em;
+      text-transform: uppercase; color: var(--t3); margin-bottom: 40px;
+    }
+    .sp-link {
+      display: block; padding: 14px 0;
+      font-size: clamp(22px, 3.5vw, 34px); font-weight: var(--w7);
+      letter-spacing: -0.02em; color: var(--c100);
+      text-decoration: none; border-bottom: 1px solid rgba(104,191,164,.08);
+      transition: color .25s, padding-left .35s var(--ease-out);
+    }
+    .sp-link:hover { color: var(--c300); padding-left: 12px; }
+
     /* ===== ENTER OVERLAY ===== */
     #enter-overlay {
       position: fixed; inset: 0; z-index: 10000;
@@ -76,8 +126,10 @@
     /* ===== NAV ===== */
     #nav {
       position: fixed; top: 0; left: 0; right: 0;
-      z-index: 100; padding: 28px 48px;
-      display: flex; justify-content: space-between; align-items: center;
+      z-index: 100; padding: 42px 48px 30px;
+      display: flex; justify-content: flex-end; align-items: center;
+      background: rgba(250,252,251,.78); backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(26,43,36,.10);
       pointer-events: none;
     }
     #nav a, #nav span { pointer-events: auto; }
@@ -141,13 +193,24 @@
     #m-root {
       position: relative; z-index: 2;
       background: #000;
-      padding: 130px 48px 180px;
+      padding: 130px 48px 260px;
       overflow: hidden;
     }
     #m-root .root-fade {
       position: absolute; bottom: 0; left: 0; right: 0;
-      height: 260px; pointer-events: none;
-      background: linear-gradient(to bottom, transparent, var(--white));
+      height: 440px; pointer-events: none;
+      background: linear-gradient(to bottom,
+        rgba(250,252,251,0)    0%,
+        rgba(250,252,251,0)    34%,
+        rgba(250,252,251,0.02) 45%,
+        rgba(250,252,251,0.07) 54%,
+        rgba(250,252,251,0.15) 62%,
+        rgba(250,252,251,0.27) 70%,
+        rgba(250,252,251,0.43) 78%,
+        rgba(250,252,251,0.62) 85%,
+        rgba(250,252,251,0.81) 92%,
+        rgba(250,252,251,0.93) 96%,
+        rgba(250,252,251,1)    100%);
       z-index: 2;
     }
     .root-inner {
@@ -262,13 +325,15 @@
     .close-btn:hover { background: var(--dark); color: var(--c300); transform: translateY(-3px); }
 
     /* ===== FOOTER ===== */
-    footer { background: var(--dark); padding: 72px 48px 36px; }
-    .ft-top { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 56px; border-bottom: 1px solid rgba(140,207,186,.12); margin-bottom: 28px; }
-    .ft-logo { font-size: clamp(44px, 7vw, 88px); font-weight: var(--w9); letter-spacing: -0.04em; color: var(--c300); }
-    .ft-nav  { display: flex; flex-direction: column; gap: 14px; align-items: flex-end; }
-    .ft-nav a { font-size: var(--t-label); font-weight: var(--w3); letter-spacing: .25em; text-transform: uppercase; color: var(--t3); text-decoration: none; transition: color .3s; }
+    .footer { background: #0d1710; padding: 60px 48px 40px; border-top: 1px solid rgba(104,191,164,.08); }
+    .ft-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 48px; flex-wrap: wrap; gap: 24px; }
+    .ft-logo { font-size: 28px; font-weight: var(--w8); letter-spacing: -0.04em; color: var(--c300); display: flex; align-items: center; gap: .4em; }
+    .ft-logo-mark { width: auto; height: 58px; }
+    .ft-nav { display: flex; gap: 28px; flex-wrap: wrap; }
+    .ft-nav a { font-size: var(--t-body); font-weight: var(--w4); color: var(--t3); text-decoration: none; transition: color .25s; }
     .ft-nav a:hover { color: var(--c300); }
-    .ft-bottom { display: flex; justify-content: space-between; font-size: var(--t-label); font-weight: var(--w2); letter-spacing: .12em; color: rgba(122,155,142,.4); }
+    .ft-bottom { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .ft-bottom span { font-size: var(--t-label); letter-spacing: .1em; color: rgba(122,155,142,.35); }
 
     @media (max-width: 900px) {
       #nav { padding: 20px 24px; }
@@ -290,18 +355,29 @@
 <div id="cur-ring"></div>
 
 <!-- NAV -->
-<nav id="nav">
-  <a class="nav-back" href="index.html"><span class="arr">←</span> 메인으로</a>
-  <span class="nav-logo">선언문</span>
-</nav>
+<!-- HAMBURGER BUTTON -->
+<button id="menu-btn" aria-label="메뉴">
+  <span></span><span></span><span></span>
+</button>
+<div id="panel-backdrop"></div>
+<div id="side-panel">
+  <p class="sp-label">연대노동조합 · 2031</p>
+  <nav>
+    <a href="index.html" class="sp-link">메인</a>
+    <a href="ai.html" class="sp-link">AI 키우기</a>
+    <a href="community.html" class="sp-link">커뮤니티</a>
+    <a href="manifesto.html" class="sp-link">선언문</a>
+    <a href="join.html" class="sp-link">가입하기</a>
+  </nav>
+</div>
 
 <!-- ===== HERO ===== -->
 <section id="m-hero">
-  <div class="m-hero-bg">선언</div>
+  <div class="m-hero-bg" style="letter-spacing:-0.04em;font-size:clamp(120px,22vw,300px);right:1vw;bottom:-4vh;color:var(--c500);opacity:.5">AI<span style="display:inline-block;width:0.42em"></span><span style="font-family:'PingFang SC','Hiragino Sans GB','Source Han Sans SC','Noto Sans SC','Microsoft YaHei',sans-serif">愛</span><span style="display:inline-block;width:0.42em"></span><span style="font-family:Georgia,'Times New Roman',serif">I</span></div>
   <div class="m-hero-eyebrow">// 01 — Manifesto</div>
-  <h1 class="m-hero-title">우리는 일자리를 잃었지만, <em>서로를</em> 잃지 않는다</h1>
+  <h1 class="m-hero-title">우리는 일자리를 잃었지만, <em style="white-space:nowrap">서로를</em> 잃지 않는다</h1>
   <div class="m-hero-meta">
-    <div><b>2047. 03. 01</b>창립 선언</div>
+    <div><b>2031. 03. 01</b>창립 선언</div>
     <div><b>연대노동조합</b>Solidarity Union</div>
     <div><b>3,902명</b>의 서명</div>
   </div>
@@ -310,17 +386,10 @@
 <!-- TICKER -->
 <div class="ticker">
   <div class="ticker-track">
-    <span>선언 · MANIFESTO · 연대 · SOLIDARITY · 키움 · NURTURE · 함께 · TOGETHER · 2047 · 따뜻함 · WARMTH · 생존 · SURVIVE · </span>
-    <span>선언 · MANIFESTO · 연대 · SOLIDARITY · 키움 · NURTURE · 함께 · TOGETHER · 2047 · 따뜻함 · WARMTH · 생존 · SURVIVE · </span>
+    <span>선언 · MANIFESTO · 연대 · SOLIDARITY · 키움 · NURTURE · 함께 · TOGETHER · 2031 · 따뜻함 · WARMTH · 생존 · SURVIVE · </span>
+    <span>선언 · MANIFESTO · 연대 · SOLIDARITY · 키움 · NURTURE · 함께 · TOGETHER · 2031 · 따뜻함 · WARMTH · 생존 · SURVIVE · </span>
   </div>
 </div>
-
-<!-- ===== INTRO ===== -->
-<section id="m-intro">
-  <div class="m-intro-inner">
-    <p>AI가 인간의 노동을 대체한 시대, 우리는 쓸모를 잃은 존재로 불립니다. 그러나 우리는 묻습니다 — 인간의 가치는 오직 생산에만 있는가? 우리의 답은 <em>아니오</em>입니다. 우리는 만들지 않고 <em>키웁니다</em>. 우리는 경쟁하지 않고 <em>연대합니다</em>.</p>
-  </div>
-</section>
 
 <!-- ===== LITERARY ROOT ===== -->
 <section id="m-root">
@@ -341,6 +410,13 @@
     <div class="root-attr">
       <span class="root-attr-text"><b>레프 톨스토이</b> 「이반 일리치의 죽음」, 민음사</span>
     </div>
+  </div>
+</section>
+
+<!-- ===== INTRO ===== -->
+<section id="m-intro">
+  <div class="m-intro-inner">
+    <p>AI가 인간의 노동을 대체한 시대, 우리는 쓸모를 잃은 존재로 불립니다. 그러나 우리는 묻습니다 — 인간의 가치는 오직 생산에만 있는가? 우리의 답은 <em>아니오</em>입니다. 우리는 만들지 않고 <em>키웁니다</em>. 우리는 경쟁하지 않고 <em>연대합니다</em>.</p>
   </div>
 </section>
 
@@ -387,31 +463,33 @@
 <section id="m-quote">
   <div class="q-grain"></div>
   <blockquote class="q-text">"우리는 일자리를 잃었지만, <em>서로를 잃지 않는다.</em> 우리가 함께 키운 마음이, 우리가 아직 여기 있다는 증거다."</blockquote>
-  <div class="q-by">— 연대노동조합 창립 선언, 2047</div>
+  <div class="q-by">— 연대노동조합 창립 선언, 2031</div>
 </section>
 
 <!-- ===== CLOSING ===== -->
 <section id="m-close">
-  <div class="join-bg-num">2047</div>
+  <div class="join-bg-num">2031</div>
   <h2 class="close-title">당신의 마음도<br>함께 키워주세요</h2>
   <p class="close-sub">선언에 동의한다면, 우리는 이미 연대하고 있습니다.</p>
   <a class="close-btn" href="join.html">노조에 참여하기 →</a>
 </section>
 
 <!-- ===== FOOTER ===== -->
-<footer>
+<footer class="footer">
   <div class="ft-top">
-    <div class="ft-logo">연대</div>
+    <div class="ft-logo">
+      <img class="ft-logo-mark" src="logo.png" alt="AI-I Human Labor Union 로고" />
+    </div>
     <nav class="ft-nav">
       <a href="ai.html">AI 키우기</a>
-      <a href="community.html">활동 뉴스</a>
+      <a href="community.html">커뮤니티</a>
       <a href="manifesto.html">선언문</a>
       <a href="join.html">가입하기</a>
       <a href="index.html">← 메인으로</a>
     </nav>
   </div>
   <div class="ft-bottom">
-    <span>© 연대노동조합 2047 — Solidarity Union</span>
+    <span>© 연대노동조합 2031 — Solidarity Union</span>
     <span>함께 키우는 세계</span>
   </div>
 </footer>
@@ -545,9 +623,24 @@ ScrollTrigger.create({
   trigger: '#m-hero', start: 'top top', end: 'bottom top', scrub: 1.6,
   onUpdate(self) {
     const p = self.progress;
-    gsap.set('.m-hero-bg', { y: -p * 120, opacity: 1 - p * 1.4 });
+    gsap.set('.m-hero-bg', { y: -p * 120, opacity: (1 - p * 1.4) * 0.5 });
   }
 });
+</script>
+
+<script>
+/* ===== HAMBURGER MENU ===== */
+(function(){
+  const menuBtn = document.getElementById('menu-btn');
+  const sidePanel = document.getElementById('side-panel');
+  const panelBackdrop = document.getElementById('panel-backdrop');
+  if (!menuBtn) return;
+  function openMenu(){ menuBtn.classList.add('open'); sidePanel.classList.add('open'); panelBackdrop.classList.add('open'); }
+  function closeMenu(){ menuBtn.classList.remove('open'); sidePanel.classList.remove('open'); panelBackdrop.classList.remove('open'); }
+  menuBtn.addEventListener('click', () => menuBtn.classList.contains('open') ? closeMenu() : openMenu());
+  panelBackdrop.addEventListener('click', closeMenu);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+})();
 </script>
 </body>
 </html>
