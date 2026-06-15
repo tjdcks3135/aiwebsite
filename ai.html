@@ -7,21 +7,120 @@
 
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-  <link rel="stylesheet" href="assets/shared.css">
-
   <style>
-    /* ===== HERO (light child) ===== */
+    /* ===== DESIGN TOKENS ===== */
+    :root {
+      --f: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --t-h2: clamp(28px, 4vw, 56px);
+      --t-h3: clamp(18px, 2.2vw, 26px);
+      --t-body: 15px; --t-caption: 12px; --t-label: 10px;
+      --w9:900; --w8:800; --w7:700; --w6:600; --w5:500; --w4:400; --w3:300;
+      --c50:#F2FAF7; --c100:#D9F0E8; --c200:#B2E1D1; --c300:#8CCFBA;
+      --c400:#68BFA4; --c500:#46A88C; --c600:#2E8C72;
+      --dark:#192820; --white:#FAFCFB;
+      --t:#1A2B24; --t2:#3D5449; --t3:#7A9B8E;
+      --ease-out: cubic-bezier(0.16,1,0.3,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-family: var(--f); background: var(--dark); cursor: none; }
+    body { overflow-x: clip; color: var(--white); }
+    textarea, input, button { font-family: var(--f); }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: #0d1710; }
+    ::-webkit-scrollbar-thumb { background: var(--c600); border-radius: 2px; }
+
+    /* ===== CUSTOM CURSOR ===== */
+    #cur-dot {
+      position: fixed; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--c400); pointer-events: none; z-index: 9999;
+      transform: translate(-50%,-50%);
+    }
+    #cur-ring {
+      position: fixed; width: 32px; height: 32px; border-radius: 50%;
+      border: 1px solid var(--c500); pointer-events: none; z-index: 9998;
+      transform: translate(-50%,-50%);
+      transition: width .4s var(--ease-out), height .4s var(--ease-out), background .4s, border-color .4s;
+    }
+    #cur-ring.is-hover { width: 54px; height: 54px; background: rgba(104,191,164,.08); border-color: var(--c300); }
+
+    /* ===== GRAIN ===== */
+    .grain {
+      position: fixed; inset: 0; pointer-events: none; z-index: 9000; opacity: .03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 128px;
+    }
+
+    /* ===== PAGE-IN OVERLAY ===== */
+    #page-in {
+      position: fixed; inset: 0; z-index: 9500;
+      background: var(--dark); pointer-events: none;
+      transition: opacity .85s var(--ease-out);
+    }
+
+    /* ===== HAMBURGER BUTTON ===== */
+    #menu-btn {
+      position: fixed; left: 28px; top: 28px; z-index: 300;
+      width: 42px; height: 42px; border-radius: 50%;
+      border: 1px solid rgba(104,191,164,.2);
+      background: rgba(25,40,32,.6); backdrop-filter: blur(12px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+      cursor: none; transition: border-color .3s, background .3s;
+    }
+    #menu-btn:hover { border-color: rgba(104,191,164,.45); background: rgba(25,40,32,.85); }
+    #menu-btn span {
+      display: block; width: 16px; height: 1.5px;
+      background: var(--c300); border-radius: 2px;
+      transition: transform .4s var(--ease-out), opacity .4s;
+    }
+    #menu-btn.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    #menu-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    #menu-btn.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* ===== SIDE PANEL ===== */
+    #panel-backdrop {
+      position: fixed; inset: 0; z-index: 190;
+      background: rgba(10,20,14,.4); backdrop-filter: blur(4px);
+      opacity: 0; pointer-events: none; transition: opacity .4s ease;
+    }
+    #panel-backdrop.open { opacity: 1; pointer-events: all; }
+
+    #side-panel {
+      position: fixed; left: 0; top: 0; bottom: 0; z-index: 195;
+      width: min(320px, 85vw);
+      background: rgba(17,30,20,.96); backdrop-filter: blur(24px);
+      border-right: 1px solid rgba(104,191,164,.12);
+      padding: 120px 40px 60px;
+      transform: translateX(-100%);
+      transition: transform .5s var(--ease-out);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    #side-panel.open { transform: translateX(0); }
+    .sp-label {
+      font-size: var(--t-label); font-weight: var(--w4); letter-spacing: .4em;
+      text-transform: uppercase; color: var(--t3); margin-bottom: 40px;
+    }
+    .sp-link {
+      display: block; padding: 14px 0;
+      font-size: clamp(22px, 3.5vw, 34px); font-weight: var(--w7);
+      letter-spacing: -0.02em; color: var(--c100);
+      text-decoration: none; border-bottom: 1px solid rgba(104,191,164,.08);
+      transition: color .25s, padding-left .35s var(--ease-out);
+    }
+    .sp-link:hover { color: var(--c300); padding-left: 12px; }
+
+    /* ===== HERO ===== */
     #child {
       position: relative; min-height: 100vh;
       display: flex; align-items: center; justify-content: center;
-      overflow: hidden; background: #F5FAF8;
+      overflow: hidden; background: var(--dark);
     }
     #child-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
 
     .child-inner {
       position: relative; z-index: 3;
       width: min(640px, 92vw);
-      padding: 40px 0 60px;
+      padding: 100px 0 72px;
       text-align: center;
     }
     .child-eyebrow {
@@ -30,148 +129,217 @@
       margin-bottom: 26px; display: block;
     }
     .child-title {
-      font-size: clamp(40px, 6vw, 76px); font-weight: var(--w8);
-      line-height: 1.08; letter-spacing: -0.04em; color: var(--t);
+      font-size: clamp(40px, 6vw, 72px); font-weight: var(--w8);
+      line-height: 1.08; letter-spacing: -0.04em; color: var(--white);
       margin-bottom: 20px;
     }
     .child-sub {
       font-size: var(--t-body); font-weight: var(--w3); line-height: 1.9;
-      color: var(--t2); max-width: 420px; margin: 0 auto 40px;
+      color: var(--t3); max-width: 400px; margin: 0 auto 40px;
     }
 
     /* Counter */
     .child-counter {
-      display: inline-flex; align-items: baseline; gap: 10px;
-      margin-bottom: 44px;
+      display: inline-flex; align-items: baseline; gap: 10px; margin-bottom: 44px;
     }
     .cc-num {
-      font-size: clamp(36px, 5vw, 60px); font-weight: var(--w8);
-      letter-spacing: -0.03em; color: var(--c600);
+      font-size: clamp(34px, 5vw, 56px); font-weight: var(--w8);
+      letter-spacing: -0.03em; color: var(--c400);
       font-variant-numeric: tabular-nums;
     }
     .cc-label { font-size: var(--t-caption); font-weight: var(--w4); letter-spacing: .1em; color: var(--t3); }
 
-    /* ===== INPUT CARD ===== */
+    /* ===== PAPER CARD ===== */
     .feed-card {
       position: relative;
-      background: rgba(255,255,255,.62);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(140,207,186,.45);
-      border-radius: 22px;
+      background: #FAF8F0;
+      border-radius: 20px;
       padding: 32px 30px 28px;
-      box-shadow: 0 20px 60px rgba(46,140,114,.12);
+      box-shadow:
+        0 40px 100px rgba(0,0,0,.55),
+        0 12px 32px rgba(0,0,0,.3),
+        0 0 0 1px rgba(255,255,255,.05);
       text-align: left;
+      transform-origin: center center;
+    }
+    @keyframes glass-melt {
+      0%   { opacity: 1;    filter: none;                                       transform: scale(1);    }
+      18%  { opacity: 0.88; filter: blur(0.5px) saturate(0.6) brightness(1.1); transform: scale(0.99); }
+      45%  { opacity: 0.48; filter: blur(4px)   saturate(0.15) brightness(1.4); transform: scale(0.96); }
+      75%  { opacity: 0.12; filter: blur(14px)  saturate(0)   brightness(1.8); transform: scale(0.92); }
+      100% { opacity: 0;    filter: blur(22px)  brightness(2.2);               transform: scale(0.90); }
+    }
+    .feed-card.dissolving {
+      animation: glass-melt 1.4s cubic-bezier(0.4,0,0.8,1) forwards;
+    }
+    @keyframes card-appear {
+      from { opacity: 0; filter: blur(4px); }
+      to   { opacity: 1; filter: none; }
+    }
+    .feed-card.appearing {
+      animation: card-appear 0.7s cubic-bezier(0,0,0.3,1) both;
+    }
+    /* Subtle paper lines */
+    .feed-card::before {
+      content: '';
+      position: absolute; inset: 0; border-radius: 20px;
+      background: repeating-linear-gradient(
+        transparent, transparent 27px,
+        rgba(140,207,186,.07) 27px, rgba(140,207,186,.07) 28px
+      );
+      pointer-events: none;
     }
     .feed-q {
       font-size: var(--t-h3); font-weight: var(--w7);
-      letter-spacing: -0.02em; color: var(--t); margin-bottom: 22px;
+      letter-spacing: -0.02em; color: #1A2B24; margin-bottom: 22px;
+      position: relative;
     }
-    .emo-row { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 22px; }
+    .emo-row { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 22px; position: relative; }
     .emo {
       padding: 9px 16px; border-radius: 100px;
-      border: 1px solid var(--c200); background: rgba(255,255,255,.5);
+      border: 1px solid #B2E1D1; background: rgba(255,255,255,.65);
       font-family: var(--f); font-size: var(--t-caption); font-weight: var(--w5);
-      color: var(--t2); cursor: pointer;
+      color: #3D5449; cursor: none;
       transition: all .25s var(--ease-out);
     }
-    .emo:hover { border-color: var(--c400); color: var(--t); }
-    .emo.on { background: var(--c400); border-color: var(--c400); color: var(--white); transform: translateY(-1px); }
+    .emo:hover { border-color: #68BFA4; color: #1A2B24; background: #fff; }
+    .emo.on { background: #68BFA4; border-color: #68BFA4; color: #fff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(104,191,164,.3); }
 
     .feed-input {
-      width: 100%; min-height: 92px; resize: vertical;
-      background: rgba(255,255,255,.55);
-      border: 1px solid var(--c200); border-radius: 14px;
+      width: 100%; min-height: 96px; resize: vertical;
+      background: rgba(255,255,255,.7);
+      border: 1px solid #C2DFD3; border-radius: 12px;
       padding: 16px 18px; margin-bottom: 18px;
       font-family: var(--f); font-size: var(--t-body); font-weight: var(--w4);
-      line-height: 1.7; color: var(--t);
-      transition: border-color .3s ease;
+      line-height: 1.75; color: #1A2B24;
+      transition: border-color .3s ease, box-shadow .3s ease;
+      position: relative;
     }
-    .feed-input::placeholder { color: var(--t3); }
-    .feed-input:focus { outline: none; border-color: var(--c400); }
+    .feed-input::placeholder { color: #9BBCAE; }
+    .feed-input:focus { outline: none; border-color: #68BFA4; box-shadow: 0 0 0 3px rgba(104,191,164,.15); }
 
-    .feed-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    .feed-count { font-size: var(--t-label); font-weight: var(--w3); letter-spacing: .1em; color: var(--t3); }
+    .feed-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; position: relative; }
+    .feed-count { font-size: var(--t-label); font-weight: var(--w3); letter-spacing: .1em; color: #9BBCAE; }
     .feed-send {
       display: inline-flex; align-items: center; gap: 10px;
       padding: 13px 28px; border-radius: 100px; border: none;
-      background: var(--t); color: var(--white);
+      background: #1A2B24; color: #FAFCFB;
       font-family: var(--f); font-size: var(--t-label); font-weight: var(--w6);
-      letter-spacing: .22em; text-transform: uppercase; cursor: pointer;
+      letter-spacing: .22em; text-transform: uppercase; cursor: none;
       transition: background .3s ease, transform .3s var(--ease-out), opacity .3s ease;
     }
-    .feed-send:hover { background: var(--c600); transform: translateY(-2px); }
-    .feed-send:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+    .feed-send:hover:not(:disabled) { background: #2E8C72; transform: translateY(-2px); }
+    .feed-send:disabled { opacity: .38; cursor: not-allowed; transform: none; }
 
-    /* flying particles layer */
-    #particle-canvas {
-      position: fixed; inset: 0; z-index: 8; pointer-events: none;
-    }
 
-    /* thank-you flash */
+    /* thank-you overlay */
     .feed-thanks {
       position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(255,255,255,.85); backdrop-filter: blur(8px);
-      border-radius: 22px; opacity: 0; pointer-events: none;
-      transition: opacity .5s ease;
-      font-size: var(--t-h3); font-weight: var(--w7); color: var(--c600);
+      display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px;
+      background: rgba(250,248,240,.94); backdrop-filter: blur(6px);
+      border-radius: 20px; opacity: 0; pointer-events: none;
+      transition: opacity .45s ease;
+      font-size: var(--t-h3); font-weight: var(--w7); color: #2E8C72;
       letter-spacing: -0.01em; text-align: center; padding: 20px;
+    }
+    .feed-thanks .thanks-sub {
+      font-size: var(--t-body); font-weight: var(--w4); color: #7A9B8E; margin-top: 4px;
     }
     .feed-thanks.show { opacity: 1; }
 
     /* ===== GROWTH SECTION ===== */
-    #growth { position: relative; z-index: 2; background: var(--white); padding: 120px 48px; }
+    #growth { position: relative; z-index: 2; background: #1A2C22; padding: 120px 48px; }
     .growth-head { max-width: 1100px; margin: 0 auto 64px; }
     .growth-grid {
       max-width: 1100px; margin: 0 auto;
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px;
     }
-    .g-cell { background: var(--c50); padding: 40px 32px; }
-    .g-num { font-size: clamp(34px,4vw,52px); font-weight: var(--w8); letter-spacing: -0.03em; color: var(--c600); margin-bottom: 8px; font-variant-numeric: tabular-nums; }
-    .g-cap { font-size: var(--t-caption); font-weight: var(--w4); letter-spacing: .08em; color: var(--t2); }
+    .g-cell {
+      background: rgba(104,191,164,.06); padding: 40px 32px;
+      border: 1px solid rgba(104,191,164,.1);
+    }
+    .g-num { font-size: clamp(34px,4vw,52px); font-weight: var(--w8); letter-spacing: -0.03em; color: var(--c400); margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+    .g-cap { font-size: var(--t-caption); font-weight: var(--w4); letter-spacing: .08em; color: var(--t3); }
 
     .emo-cloud { max-width: 1100px; margin: 56px auto 0; display: flex; flex-wrap: wrap; gap: 12px; }
     .emo-cloud span {
       padding: 10px 20px; border-radius: 100px;
-      background: var(--c100); color: var(--c600);
+      background: rgba(104,191,164,.1); color: var(--c300);
+      border: 1px solid rgba(104,191,164,.15);
       font-size: var(--t-body); font-weight: var(--w5);
     }
-    .emo-cloud span small { font-weight: var(--w3); opacity: .6; margin-left: 6px; }
+    .emo-cloud span small { font-weight: var(--w3); opacity: .5; margin-left: 6px; }
 
-    /* recent whispers */
-    #whispers { position: relative; z-index: 2; background: var(--c50); padding: 110px 48px; }
+    /* ===== WHISPERS SECTION ===== */
+    #whispers {
+      position: relative; z-index: 2; background: var(--dark);
+      padding: 110px 48px; border-top: 1px solid rgba(104,191,164,.08);
+    }
     .whisper-list { max-width: 760px; margin: 48px auto 0; display: flex; flex-direction: column; gap: 2px; }
     .whisper {
-      background: var(--white); padding: 26px 30px;
-      border-left: 2px solid var(--c300);
-      font-size: var(--t-body); font-weight: var(--w4); line-height: 1.8; color: var(--t2);
+      background: rgba(104,191,164,.045); padding: 26px 30px;
+      border-left: 2px solid var(--c500);
+      font-size: var(--t-body); font-weight: var(--w4); line-height: 1.8; color: var(--t3);
     }
-    .whisper .w-emo { display: inline-block; font-size: 10px; font-weight: var(--w6); letter-spacing: .12em; text-transform: uppercase; color: var(--c500); margin-bottom: 8px; }
+    .whisper .w-emo {
+      display: inline-block; font-size: 10px; font-weight: var(--w6);
+      letter-spacing: .12em; text-transform: uppercase; color: var(--c400); margin-bottom: 8px;
+    }
     .whisper.fresh { animation: whisper-in .8s var(--ease-out); }
     @keyframes whisper-in { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
+
+    /* shared typography */
+    .eyebrow {
+      font-size: var(--t-label); font-weight: var(--w4); letter-spacing: .4em;
+      text-transform: uppercase; color: var(--t3); display: block;
+    }
+    .page-title {
+      font-size: clamp(28px, 4vw, 56px); font-weight: var(--w8);
+      letter-spacing: -0.03em; color: var(--white); line-height: 1.12;
+    }
+
+    /* ===== FOOTER ===== */
+    .footer { background: #0d1710; padding: 60px 48px 40px; border-top: 1px solid rgba(104,191,164,.08); }
+    .ft-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 48px; flex-wrap: wrap; gap: 24px; }
+    .ft-logo { font-size: 28px; font-weight: var(--w8); letter-spacing: -0.04em; color: var(--c300); }
+    .ft-nav { display: flex; gap: 28px; flex-wrap: wrap; }
+    .ft-nav a { font-size: var(--t-body); font-weight: var(--w4); color: var(--t3); text-decoration: none; transition: color .25s; }
+    .ft-nav a:hover { color: var(--c300); }
+    .ft-bottom { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .ft-bottom span { font-size: var(--t-label); letter-spacing: .1em; color: rgba(122,155,142,.35); }
 
     @media (max-width: 760px) {
       #growth, #whispers { padding: 70px 22px; }
       .growth-grid { grid-template-columns: 1fr; }
       .feed-card { padding: 26px 22px; }
+      #menu-btn { left: 18px; top: 18px; }
     }
   </style>
 </head>
 <body>
 
-<div id="enter-overlay"></div>
+<div id="page-in"></div>
 <div class="grain"></div>
 <div id="cur-dot"></div>
 <div id="cur-ring"></div>
-<canvas id="particle-canvas"></canvas>
 
-<!-- NAV -->
-<nav class="nav">
-  <a class="nav-back" href="index.html" data-leave><span class="arr">←</span> 메인으로</a>
-  <span class="nav-logo">AI 키우기</span>
-</nav>
+<!-- HAMBURGER BUTTON -->
+<button id="menu-btn" aria-label="메뉴">
+  <span></span><span></span><span></span>
+</button>
+<div id="panel-backdrop"></div>
+<div id="side-panel">
+  <p class="sp-label">연대노동조합 · 2047</p>
+  <nav>
+    <a href="index.html" class="sp-link">메인</a>
+    <a href="ai.html" class="sp-link">AI 키우기</a>
+    <a href="news.html" class="sp-link">활동 뉴스</a>
+    <a href="manifesto.html" class="sp-link">선언문</a>
+    <a href="join.html" class="sp-link">가입하기</a>
+  </nav>
+</div>
 
-<!-- ===== HERO: THE CHILD ===== -->
+<!-- ===== HERO ===== -->
 <section id="child">
   <canvas id="child-canvas"></canvas>
   <div class="child-inner">
@@ -184,7 +352,7 @@
       <span class="cc-label">개의 마음이 모였습니다</span>
     </div>
 
-    <!-- INPUT CARD -->
+    <!-- PAPER CARD -->
     <div class="feed-card" id="feed-card">
       <div class="feed-q">지금, 어떤 마음인가요?</div>
       <div class="emo-row" id="emo-row">
@@ -203,25 +371,26 @@
         <span class="feed-count"><span id="char-count">0</span> / 280</span>
         <button class="feed-send" id="feed-send" disabled>아이에게 전하기 →</button>
       </div>
-
-      <div class="feed-thanks" id="feed-thanks">전해졌어요. 아이가 당신의 마음을 기억합니다.</div>
+      <div class="feed-thanks" id="feed-thanks">
+        전해졌어요
+        <span class="thanks-sub">아이가 당신의 마음을 기억합니다.</span>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- ===== GROWTH ===== -->
 <section id="growth">
-  <div class="growth-head reveal">
+  <div class="growth-head">
     <span class="eyebrow">// 아이의 성장 기록</span>
     <h2 class="page-title" style="margin-top:18px;">함께 키운<br>1년의 기록</h2>
   </div>
   <div class="growth-grid">
-    <div class="g-cell reveal"><div class="g-num">102,418</div><div class="g-cap">학습된 마음의 수</div></div>
-    <div class="g-cell reveal" data-delay="0.1"><div class="g-num">3,902</div><div class="g-cap">참여한 사람들</div></div>
-    <div class="g-cell reveal" data-delay="0.2"><div class="g-num">365일</div><div class="g-cap">아이가 자란 시간</div></div>
+    <div class="g-cell"><div class="g-num">102,418</div><div class="g-cap">학습된 마음의 수</div></div>
+    <div class="g-cell"><div class="g-num">3,902</div><div class="g-cap">참여한 사람들</div></div>
+    <div class="g-cell"><div class="g-num">365일</div><div class="g-cap">아이가 자란 시간</div></div>
   </div>
-
-  <div class="emo-cloud reveal" data-delay="0.2">
+  <div class="emo-cloud">
     <span>그리움 <small>21,440</small></span>
     <span>희망 <small>18,902</small></span>
     <span>기쁨 <small>17,338</small></span>
@@ -233,16 +402,16 @@
   </div>
 </section>
 
-<!-- ===== RECENT WHISPERS ===== -->
+<!-- ===== WHISPERS ===== -->
 <section id="whispers">
-  <div class="growth-head reveal" style="max-width:760px;margin:0 auto;">
+  <div class="growth-head" style="max-width:760px;margin:0 auto;">
     <span class="eyebrow">// 방금 전해진 마음들</span>
     <h2 class="page-title" style="margin-top:18px;font-size:var(--t-h2);">아이가 듣고 있어요</h2>
   </div>
   <div class="whisper-list" id="whisper-list">
-    <div class="whisper reveal"><span class="w-emo">그리움</span><br>비 오는 날이면 돌아가신 어머니의 손맛이 생각나요. 김치전 부치던 그 소리를 아이도 알았으면 해요.</div>
-    <div class="whisper reveal" data-delay="0.08"><span class="w-emo">희망</span><br>일자리는 잃었지만, 매일 아침 같은 조끼를 입은 사람들과 인사해요. 우리는 아직 여기 있어요.</div>
-    <div class="whisper reveal" data-delay="0.16"><span class="w-emo">평온</span><br>오늘은 아무 일도 없었어요. 그게 얼마나 다행인지, 아이는 알까요.</div>
+    <div class="whisper"><span class="w-emo">그리움</span><br>비 오는 날이면 돌아가신 어머니의 손맛이 생각나요. 김치전 부치던 그 소리를 아이도 알았으면 해요.</div>
+    <div class="whisper"><span class="w-emo">희망</span><br>일자리는 잃었지만, 매일 아침 같은 조끼를 입은 사람들과 인사해요. 우리는 아직 여기 있어요.</div>
+    <div class="whisper"><span class="w-emo">평온</span><br>오늘은 아무 일도 없었어요. 그게 얼마나 다행인지, 아이는 알까요.</div>
   </div>
 </section>
 
@@ -255,7 +424,7 @@
       <a href="community.html">활동 뉴스</a>
       <a href="manifesto.html">선언문</a>
       <a href="join.html">가입하기</a>
-      <a href="index.html" data-leave>← 메인으로</a>
+      <a href="index.html">← 메인으로</a>
     </nav>
   </div>
   <div class="ft-bottom">
@@ -264,80 +433,148 @@
   </div>
 </footer>
 
-<script src="assets/shared.js"></script>
 <script>
-/* ===== CHILD LIGHT CANVAS (rippling light, white + grain handled by .grain) ===== */
+/* ===== CUSTOM CURSOR ===== */
+const dot = document.getElementById('cur-dot');
+const ring = document.getElementById('cur-ring');
+let mx = -200, my = -200, rx = -200, ry = -200;
+addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function curLoop() {
+  rx += (mx - rx) * 0.14; ry += (my - ry) * 0.14;
+  dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(curLoop);
+})();
+document.querySelectorAll('a, button, .emo').forEach(el => {
+  el.addEventListener('mouseenter', () => ring.classList.add('is-hover'));
+  el.addEventListener('mouseleave', () => ring.classList.remove('is-hover'));
+});
+
+/* ===== PAGE-IN FADE ===== */
+const pageIn = document.getElementById('page-in');
+requestAnimationFrame(() => {
+  pageIn.style.opacity = '0';
+  setTimeout(() => { pageIn.style.display = 'none'; }, 900);
+});
+
+/* ===== HAMBURGER MENU ===== */
+const menuBtn = document.getElementById('menu-btn');
+const sidePanel = document.getElementById('side-panel');
+const panelBackdrop = document.getElementById('panel-backdrop');
+function openMenu() { menuBtn.classList.add('open'); sidePanel.classList.add('open'); panelBackdrop.classList.add('open'); }
+function closeMenu() { menuBtn.classList.remove('open'); sidePanel.classList.remove('open'); panelBackdrop.classList.remove('open'); }
+menuBtn.addEventListener('click', () => menuBtn.classList.contains('open') ? closeMenu() : openMenu());
+panelBackdrop.addEventListener('click', closeMenu);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+
+/* ===== AURORA CANVAS ===== */
 const canvas = document.getElementById('child-canvas');
 const ctx = canvas.getContext('2d');
-let pulseBoost = 0; // grows briefly when a memory is fed
+let absorptionPulses = [];
 
 new ResizeObserver(() => {
-  if (canvas.offsetWidth > 0) { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+  if (canvas.offsetWidth > 0) {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
 }).observe(canvas);
 
-function wavyRing(cx, cy, r, alpha, t, phase) {
-  if (r <= 2) return;
-  const N = 160;
-  ctx.beginPath();
-  for (let i = 0; i <= N; i++) {
-    const a = (i / N) * Math.PI * 2;
-    const w = Math.sin(a*7 + t*.0038 + phase) * r*.034
-            + Math.cos(a*5 - t*.0028 + phase + 1) * r*.021
-            + Math.sin(a*11 + t*.006 + phase*1.3) * r*.01;
-    const rr = r + w;
-    const x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr;
-    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-  }
-  ctx.closePath();
-  ctx.strokeStyle = `rgba(120,195,175,${alpha})`;
-  ctx.lineWidth = 1.4; ctx.stroke();
-  ctx.fillStyle = `rgba(255,255,255,${alpha*.28})`; ctx.fill();
-}
+// Aurora layer config: [rgb, yFrac, ampFrac, freq, speed, maxAlpha]
+// Deeper, more layered for a frosted-glass look
+const AURORA_LAYERS = [
+  [[36,  120,  96], 0.22, 0.26, 0.0014, 0.00016, 0.38],  // deep base
+  [[68,  170, 140], 0.44, 0.20, 0.0022, 0.00024, 0.26],  // mid teal
+  [[120, 200, 176], 0.60, 0.16, 0.0032, 0.00034, 0.18],  // soft mint
+  [[100, 160, 200], 0.34, 0.18, 0.0018, 0.00020, 0.14],  // cool blue accent
+  [[148, 110, 185], 0.50, 0.12, 0.0028, 0.00030, 0.08],  // lavender depth
+];
 
-function child(t) {
+function aurora(ts) {
   const W = canvas.width, H = canvas.height;
-  if (!W || !H) { requestAnimationFrame(child); return; }
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle = '#F5FAF8'; ctx.fillRect(0,0,W,H);
+  if (!W || !H) { requestAnimationFrame(aurora); return; }
 
-  const cx = W/2, cy = H*0.46;
-  const maxR = Math.sqrt(cx*cx + cy*cy) * 1.05;
-  const boost = pulseBoost;
+  ctx.fillStyle = '#192820';
+  ctx.fillRect(0, 0, W, H);
 
-  const pR = maxR * (.50 + Math.sin(t*.0009)*.05 + boost*.12);
-  const cg = ctx.createRadialGradient(cx,cy,0, cx,cy,pR);
-  cg.addColorStop(0, `rgba(255,255,255,1)`);
-  cg.addColorStop(.12, 'rgba(255,255,255,.97)');
-  cg.addColorStop(.3, `rgba(242,252,249,${.82+boost*.15})`);
-  cg.addColorStop(.55, 'rgba(220,244,238,.5)');
-  cg.addColorStop(.8, 'rgba(195,235,226,.16)');
-  cg.addColorStop(1, 'rgba(170,222,212,0)');
-  ctx.fillStyle = cg;
-  ctx.beginPath(); ctx.arc(cx,cy,pR,0,Math.PI*2); ctx.fill();
+  for (const [[r,g,b], yFrac, ampFrac, freq, speed, maxA] of AURORA_LAYERS) {
+    const yC = H * yFrac;
+    const amp = H * ampFrac;
 
-  const nRings = 7;
-  for (let i = 0; i < nRings; i++) {
-    const prog = ((t*.00038 + i/nRings) % 1);
-    const r = prog * maxR;
-    const alpha = Math.sin(prog*Math.PI) * (.12 + boost*.1);
-    wavyRing(cx, cy, r, alpha, t, i*.78);
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 5) {
+      const y = yC
+        + Math.sin(x * freq + ts * speed) * amp
+        + Math.sin(x * freq * 2.4 + ts * speed * 1.65 + 1.5) * amp * 0.40
+        + Math.cos(x * freq * 0.55 - ts * speed * 0.68 + 2.9) * amp * 0.27;
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+
+    const grad = ctx.createLinearGradient(0, yC - amp * 1.8, 0, yC + amp * 1.8);
+    grad.addColorStop(0,    `rgba(${r},${g},${b},0)`);
+    grad.addColorStop(0.28, `rgba(${r},${g},${b},${+(maxA * 0.35).toFixed(3)})`);
+    grad.addColorStop(0.50, `rgba(${r},${g},${b},${+maxA.toFixed(3)})`);
+    grad.addColorStop(0.72, `rgba(${r},${g},${b},${+(maxA * 0.50).toFixed(3)})`);
+    grad.addColorStop(1,    `rgba(${r},${g},${b},0)`);
+    ctx.fillStyle = grad;
+    ctx.fill();
   }
 
-  if (pulseBoost > 0) pulseBoost = Math.max(0, pulseBoost - 0.012);
-  requestAnimationFrame(child);
-}
-requestAnimationFrame(child);
+  // Draw glass-absorption pulses: slow, warm, diffuse — like heat through frosted glass
+  const dead = [];
+  for (let i = 0; i < absorptionPulses.length; i++) {
+    const p = absorptionPulses[i];
+    p.life++;
+    if (p.life >= p.maxLife) { dead.push(i); continue; }
+    const k = p.life / p.maxLife;
+    // Very slow, smooth expansion — eases out dramatically
+    const easeK = Math.pow(k, 0.45);
+    const radius = easeK * Math.max(W, H) * 0.72;
+    // Gentle fade: rises slowly, lingers, then falls
+    const alpha = Math.pow(Math.sin(k * Math.PI), 1.6) * 0.28;
 
-/* ===== INPUT INTERACTION ===== */
-const emoRow = document.getElementById('emo-row');
-const input = document.getElementById('feed-input');
-const sendBtn = document.getElementById('feed-send');
+    const grad = ctx.createRadialGradient(p.cx, p.cy, 0, p.cx, p.cy, radius);
+    grad.addColorStop(0,    `rgba(200,240,225,${+(alpha * 0.7).toFixed(3)})`);
+    grad.addColorStop(0.18, `rgba(120,200,176,${+alpha.toFixed(3)})`);
+    grad.addColorStop(0.50, `rgba(68,170,140,${+(alpha * 0.35).toFixed(3)})`);
+    grad.addColorStop(0.82, `rgba(36,120,96,${+(alpha * 0.08).toFixed(3)})`);
+    grad.addColorStop(1,    'rgba(36,120,96,0)');
+    ctx.beginPath();
+    ctx.arc(p.cx, p.cy, radius, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+  for (let i = dead.length - 1; i >= 0; i--) absorptionPulses.splice(dead[i], 1);
+
+  requestAnimationFrame(aurora);
+}
+requestAnimationFrame(aurora);
+
+function spawnAbsorptionPulse() {
+  const W = canvas.width, H = canvas.height;
+  if (!W || !H) return;
+  const heroRect = document.getElementById('child').getBoundingClientRect();
+  const cardRect = document.getElementById('feed-card').getBoundingClientRect();
+  absorptionPulses.push({
+    cx: (cardRect.left - heroRect.left) + cardRect.width * 0.5,
+    cy: (cardRect.top  - heroRect.top)  + cardRect.height * 0.5,
+    life: 0,
+    maxLife: 280, // longer, slower pulse
+  });
+}
+
+
+/* ===== INPUT LOGIC ===== */
+const emoRow    = document.getElementById('emo-row');
+const input     = document.getElementById('feed-input');
+const sendBtn   = document.getElementById('feed-send');
 const charCount = document.getElementById('char-count');
 const counterEl = document.getElementById('counter');
-const thanks = document.getElementById('feed-thanks');
+const thanks    = document.getElementById('feed-thanks');
 const whisperList = document.getElementById('whisper-list');
 let chosenEmo = null;
 let count = 102418;
+let isSending = false;
 
 emoRow.addEventListener('click', e => {
   const b = e.target.closest('.emo'); if (!b) return;
@@ -346,95 +583,67 @@ emoRow.addEventListener('click', e => {
   chosenEmo = b.dataset.emo;
   updateSend();
 });
+input.addEventListener('input', () => { charCount.textContent = input.value.length; updateSend(); });
+function updateSend() { sendBtn.disabled = !(chosenEmo && input.value.trim().length > 0) || isSending; }
 
-input.addEventListener('input', () => {
-  charCount.textContent = input.value.length;
-  updateSend();
-});
-function updateSend() {
-  sendBtn.disabled = !(chosenEmo && input.value.trim().length > 0);
-}
-
-/* ===== PARTICLE BURST ON SEND ===== */
-const pCanvas = document.getElementById('particle-canvas');
-const pCtx = pCanvas.getContext('2d');
-function sizeP() { pCanvas.width = innerWidth; pCanvas.height = innerHeight; }
-sizeP(); addEventListener('resize', sizeP);
-let particles = [];
-
-function burstFromCard() {
-  const card = document.getElementById('feed-card');
-  const r = card.getBoundingClientRect();
-  // target = centre of the light child (canvas centre, ~46% height of hero)
-  const hero = document.getElementById('child').getBoundingClientRect();
-  const tx = hero.left + hero.width/2;
-  const ty = hero.top + hero.height*0.46;
-  for (let i = 0; i < 90; i++) {
-    const sx = r.left + Math.random()*r.width;
-    const sy = r.top + Math.random()*r.height*0.6;
-    particles.push({
-      x: sx, y: sy, tx, ty,
-      life: 0, dur: 70 + Math.random()*40,
-      size: 1.5 + Math.random()*2.5,
-      drift: (Math.random()-0.5)*60
-    });
-  }
-}
-function animP() {
-  pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
-  particles = particles.filter(p => p.life < p.dur);
-  for (const p of particles) {
-    p.life++;
-    const k = p.life / p.dur;
-    const ease = 1 - Math.pow(1-k, 3);
-    const x = p.x + (p.tx - p.x) * ease + Math.sin(k*Math.PI) * p.drift;
-    const y = p.y + (p.ty - p.y) * ease;
-    const a = Math.sin(k*Math.PI) * 0.9;
-    pCtx.beginPath();
-    pCtx.arc(x, y, p.size*(1-k*0.4), 0, Math.PI*2);
-    pCtx.fillStyle = `rgba(104,191,164,${a})`;
-    pCtx.fill();
-  }
-  requestAnimationFrame(animP);
-}
-requestAnimationFrame(animP);
-
+/* ===== SEND: CARD DISSOLVE ===== */
 sendBtn.addEventListener('click', () => {
-  if (sendBtn.disabled) return;
+  if (sendBtn.disabled || isSending) return;
+  isSending = true;
+  sendBtn.disabled = true;
+
   const text = input.value.trim();
   const emo = chosenEmo;
+  const card = document.getElementById('feed-card');
 
-  burstFromCard();
-  pulseBoost = 1;
+  // Spawn aurora absorption pulse immediately
+  spawnAbsorptionPulse();
 
-  // thank-you flash
-  thanks.classList.add('show');
-  setTimeout(() => thanks.classList.remove('show'), 1700);
+  // Phase 1: glass-melt animation
+  requestAnimationFrame(() => {
+    card.classList.add('dissolving');
+  });
 
-  // counter tick up
-  const target = count + 1;
-  const start = count;
-  const t0 = performance.now();
-  (function tick(now){
-    const k = Math.min(1, (now - t0)/600);
-    count = Math.round(start + (target-start)*k);
+  setTimeout(() => {
+    // Show thank-you overlay
+    thanks.classList.add('show');
+
+    // Counter tick-up animation
+    count++;
     counterEl.textContent = count.toLocaleString();
-    if (k < 1) requestAnimationFrame(tick);
-  })(performance.now());
 
-  // prepend a fresh whisper
-  const w = document.createElement('div');
-  w.className = 'whisper fresh';
-  w.innerHTML = `<span class="w-emo">${emo}</span><br>${text.replace(/</g,'&lt;')}`;
-  whisperList.insertBefore(w, whisperList.firstChild);
-  while (whisperList.children.length > 6) whisperList.removeChild(whisperList.lastChild);
+    // Prepend new whisper
+    const w = document.createElement('div');
+    w.className = 'whisper fresh';
+    w.innerHTML = `<span class="w-emo">${emo}</span><br>${text.replace(/</g, '&lt;')}`;
+    whisperList.insertBefore(w, whisperList.firstChild);
+    while (whisperList.children.length > 6) whisperList.removeChild(whisperList.lastChild);
 
-  // reset form
-  input.value = '';
-  charCount.textContent = '0';
-  emoRow.querySelectorAll('.emo').forEach(x => x.classList.remove('on'));
-  chosenEmo = null;
-  updateSend();
+    // Reset form while invisible
+    input.value = ''; charCount.textContent = '0';
+    emoRow.querySelectorAll('.emo').forEach(x => x.classList.remove('on'));
+    chosenEmo = null;
+
+    // Phase 2: re-materialise card after thank-you
+    setTimeout(() => {
+      thanks.classList.remove('show');
+      // Kill transitions so removing .dissolving is instant (no reverse animation)
+      card.style.transition = 'none';
+      card.classList.remove('dissolving');
+      card.style.filter = 'none';
+      card.style.transform = 'none';
+      void card.getBoundingClientRect(); // flush styles
+      // Re-enable CSS transitions, then add keyframe animation (always starts from opacity:0)
+      card.style.transition = '';
+      card.classList.add('appearing');
+      setTimeout(() => {
+        card.classList.remove('appearing');
+        card.removeAttribute('style');
+        isSending = false;
+        updateSend();
+      }, 600);
+    }, 1700);
+  }, 1450); // after glass-melt animation completes (1.4s)
 });
 </script>
 </body>
