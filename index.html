@@ -67,7 +67,8 @@
       background: var(--dark);
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
     }
-    .pre-word { font-size: var(--t-display); font-weight: var(--w9); color: var(--c300); letter-spacing: -0.04em; line-height: 1; }
+    .pre-word { display: flex; align-items: center; justify-content: center; }
+    .pre-word img { height: clamp(100px, 16vw, 160px); width: auto; }
     .pre-sub  { font-size: var(--t-label); font-weight: var(--w4); letter-spacing: 0.4em; text-transform: uppercase; color: var(--t3); }
 
     /* ===== MENU BUTTON ===== */
@@ -393,7 +394,7 @@
 
 <!-- PRELOADER -->
 <div id="preloader">
-  <div class="pre-word">연대</div>
+  <div class="pre-word"><img src="logo.png" alt="연대"></div>
   <div class="pre-sub">Solidarity Union &mdash; 2047</div>
 </div>
 
