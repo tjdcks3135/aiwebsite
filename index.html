@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>연대 — Solidarity Union</title>
+  <title>AI-I Human Labor Union</title>
 
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
@@ -67,6 +67,7 @@
       background: var(--dark);
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
     }
+    .pre-mark { height: 96px; width: auto; margin-bottom: 12px; }
     .pre-word { font-size: var(--t-display); font-weight: var(--w9); color: var(--c300); letter-spacing: -0.04em; line-height: 1; }
     .pre-sub  { font-size: var(--t-label); font-weight: var(--w4); letter-spacing: 0.4em; text-transform: uppercase; color: var(--t3); }
 
@@ -393,8 +394,9 @@
 
 <!-- PRELOADER -->
 <div id="preloader">
+  <img class="pre-mark" src="logo.png" alt="AI-I Human Labor Union 로고" />
   <div class="pre-word">연대</div>
-  <div class="pre-sub">Solidarity Union &mdash; 2047</div>
+  <div class="pre-sub">Solidarity Union &mdash; 2031</div>
 </div>
 
 <!-- CURSOR -->
@@ -412,7 +414,7 @@
 <!-- SIDE PANEL -->
 <div id="panel-backdrop"></div>
 <div id="side-panel">
-  <p class="sp-label">연대노동조합 · 2047</p>
+  <p class="sp-label">연대노동조합 · 2031</p>
   <nav>
     <a href="ai.html"        class="sp-link">AI 키우기</a>
     <a href="community.html"      class="sp-link">커뮤니티</a>
@@ -551,6 +553,7 @@ panelBackdrop.addEventListener('click', closeMenu);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
 
 /* ─── INITIAL STATES ─── */
+gsap.set('.pre-mark',       { opacity:0, y:24 });
 gsap.set('.pre-word',       { opacity:0, y:24 });
 gsap.set('.pre-sub',        { opacity:0 });
 gsap.set('#menu-btn',       { opacity:0, y:-6 });
@@ -845,7 +848,8 @@ gsap.timeline({ onComplete() {
   document.getElementById('preloader').style.display = 'none';
   initExp();
 }})
-  .to('.pre-word',       { opacity:1, y:0, duration:.9, ease:'power3.out' })
+  .to('.pre-mark',       { opacity:1, y:0, duration:.8, ease:'power3.out' })
+  .to('.pre-word',       { opacity:1, y:0, duration:.9, ease:'power3.out' }, '-=.5')
   .to('.pre-sub',        { opacity:1, duration:.6 }, '-=.4')
   .to('#preloader',      { opacity:0, duration:.7, delay:.5, ease:'power2.inOut' })
   .to('#menu-btn',       { opacity:1, y:0, duration:.6, ease:'power2.out' }, '-=.3')
