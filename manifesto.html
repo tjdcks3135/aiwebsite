@@ -141,13 +141,24 @@
     #m-root {
       position: relative; z-index: 2;
       background: #000;
-      padding: 130px 48px 180px;
+      padding: 130px 48px 260px;
       overflow: hidden;
     }
     #m-root .root-fade {
       position: absolute; bottom: 0; left: 0; right: 0;
-      height: 260px; pointer-events: none;
-      background: linear-gradient(to bottom, transparent, var(--white));
+      height: 440px; pointer-events: none;
+      background: linear-gradient(to bottom,
+        rgba(250,252,251,0)    0%,
+        rgba(250,252,251,0)    34%,
+        rgba(250,252,251,0.02) 45%,
+        rgba(250,252,251,0.07) 54%,
+        rgba(250,252,251,0.15) 62%,
+        rgba(250,252,251,0.27) 70%,
+        rgba(250,252,251,0.43) 78%,
+        rgba(250,252,251,0.62) 85%,
+        rgba(250,252,251,0.81) 92%,
+        rgba(250,252,251,0.93) 96%,
+        rgba(250,252,251,1)    100%);
       z-index: 2;
     }
     .root-inner {
@@ -297,9 +308,9 @@
 
 <!-- ===== HERO ===== -->
 <section id="m-hero">
-  <div class="m-hero-bg">선언</div>
+  <div class="m-hero-bg" style="letter-spacing:-0.04em;font-size:clamp(120px,22vw,300px);right:1vw;bottom:-4vh;color:var(--c500);opacity:.5">AI<span style="display:inline-block;width:0.42em"></span><span style="font-family:'PingFang SC','Hiragino Sans GB','Source Han Sans SC','Noto Sans SC','Microsoft YaHei',sans-serif">愛</span><span style="display:inline-block;width:0.42em"></span><span style="font-family:Georgia,'Times New Roman',serif">I</span></div>
   <div class="m-hero-eyebrow">// 01 — Manifesto</div>
-  <h1 class="m-hero-title">우리는 일자리를 잃었지만, <em>서로를</em> 잃지 않는다</h1>
+  <h1 class="m-hero-title">우리는 일자리를 잃었지만, <em style="white-space:nowrap">서로를</em> 잃지 않는다</h1>
   <div class="m-hero-meta">
     <div><b>2047. 03. 01</b>창립 선언</div>
     <div><b>연대노동조합</b>Solidarity Union</div>
@@ -314,13 +325,6 @@
     <span>선언 · MANIFESTO · 연대 · SOLIDARITY · 키움 · NURTURE · 함께 · TOGETHER · 2047 · 따뜻함 · WARMTH · 생존 · SURVIVE · </span>
   </div>
 </div>
-
-<!-- ===== INTRO ===== -->
-<section id="m-intro">
-  <div class="m-intro-inner">
-    <p>AI가 인간의 노동을 대체한 시대, 우리는 쓸모를 잃은 존재로 불립니다. 그러나 우리는 묻습니다 — 인간의 가치는 오직 생산에만 있는가? 우리의 답은 <em>아니오</em>입니다. 우리는 만들지 않고 <em>키웁니다</em>. 우리는 경쟁하지 않고 <em>연대합니다</em>.</p>
-  </div>
-</section>
 
 <!-- ===== LITERARY ROOT ===== -->
 <section id="m-root">
@@ -341,6 +345,13 @@
     <div class="root-attr">
       <span class="root-attr-text"><b>레프 톨스토이</b> 「이반 일리치의 죽음」, 민음사</span>
     </div>
+  </div>
+</section>
+
+<!-- ===== INTRO ===== -->
+<section id="m-intro">
+  <div class="m-intro-inner">
+    <p>AI가 인간의 노동을 대체한 시대, 우리는 쓸모를 잃은 존재로 불립니다. 그러나 우리는 묻습니다 — 인간의 가치는 오직 생산에만 있는가? 우리의 답은 <em>아니오</em>입니다. 우리는 만들지 않고 <em>키웁니다</em>. 우리는 경쟁하지 않고 <em>연대합니다</em>.</p>
   </div>
 </section>
 
@@ -545,7 +556,7 @@ ScrollTrigger.create({
   trigger: '#m-hero', start: 'top top', end: 'bottom top', scrub: 1.6,
   onUpdate(self) {
     const p = self.progress;
-    gsap.set('.m-hero-bg', { y: -p * 120, opacity: 1 - p * 1.4 });
+    gsap.set('.m-hero-bg', { y: -p * 120, opacity: (1 - p * 1.4) * 0.5 });
   }
 });
 </script>
