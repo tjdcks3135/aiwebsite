@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>가입하기 — 연대노동조합</title>
+  <title>AI-I Human Labor Union — 가입하기</title>
 
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
@@ -49,6 +49,56 @@
     }
     #cur-ring.is-hover { width: 54px; height: 54px; background: rgba(104,191,164,.08); border-color: var(--c300); }
 
+    /* ===== HAMBURGER BUTTON ===== */
+    #menu-btn {
+      position: fixed; left: 28px; top: 28px; z-index: 9000;
+      width: 42px; height: 42px; border-radius: 50%;
+      border: 1px solid rgba(104,191,164,.2);
+      background: rgba(25,40,32,.6); backdrop-filter: blur(12px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+      cursor: none; transition: border-color .3s, background .3s;
+    }
+    #menu-btn:hover { border-color: rgba(104,191,164,.45); background: rgba(25,40,32,.85); }
+    #menu-btn span {
+      display: block; width: 16px; height: 1.5px;
+      background: var(--c300); border-radius: 2px;
+      transition: transform .4s var(--ease-out), opacity .4s;
+    }
+    #menu-btn.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    #menu-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    #menu-btn.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* ===== SIDE PANEL ===== */
+    #panel-backdrop {
+      position: fixed; inset: 0; z-index: 8800;
+      background: rgba(10,20,14,.4); backdrop-filter: blur(4px);
+      opacity: 0; pointer-events: none; transition: opacity .4s ease;
+    }
+    #panel-backdrop.open { opacity: 1; pointer-events: all; }
+    #side-panel {
+      position: fixed; left: 0; top: 0; bottom: 0; z-index: 8900;
+      width: min(320px, 85vw);
+      background: rgba(17,30,20,.96); backdrop-filter: blur(24px);
+      border-right: 1px solid rgba(104,191,164,.12);
+      padding: 120px 40px 60px;
+      transform: translateX(-100%);
+      transition: transform .5s var(--ease-out);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    #side-panel.open { transform: translateX(0); }
+    .sp-label {
+      font-size: var(--t-label); font-weight: var(--w4); letter-spacing: .4em;
+      text-transform: uppercase; color: var(--t3); margin-bottom: 40px;
+    }
+    .sp-link {
+      display: block; padding: 14px 0;
+      font-size: clamp(22px, 3.5vw, 34px); font-weight: var(--w7);
+      letter-spacing: -0.02em; color: var(--c100);
+      text-decoration: none; border-bottom: 1px solid rgba(104,191,164,.08);
+      transition: color .25s, padding-left .35s var(--ease-out);
+    }
+    .sp-link:hover { color: var(--c300); padding-left: 12px; }
+
     /* ===== ENTER OVERLAY ===== */
     #enter-overlay {
       position: fixed; inset: 0; z-index: 10000;
@@ -58,10 +108,12 @@
     /* ===== NAV ===== */
     nav.nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      padding: 28px 48px; display: flex; justify-content: space-between; align-items: center;
-      background: rgba(250,252,251,.85); backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--c100);
+      padding: 42px 48px 30px; display: flex; justify-content: flex-end; align-items: center;
+      background: rgba(250,252,251,.78); backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(26,43,36,.10);
+      pointer-events: none;
     }
+    nav.nav > * { pointer-events: auto; }
     .nav-back {
       font-size: var(--t-label); font-weight: var(--w5); letter-spacing: .25em; text-transform: uppercase;
       color: var(--t3); text-decoration: none; display: flex; align-items: center; gap: 8px;
@@ -287,6 +339,17 @@
       .right-col { padding: 48px 28px 80px; }
       nav.nav { padding: 20px 28px; }
     }
+
+    /* ===== FOOTER ===== */
+    .footer { background: #0d1710; padding: 60px 48px 40px; border-top: 1px solid rgba(104,191,164,.08); }
+    .ft-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 48px; flex-wrap: wrap; gap: 24px; }
+    .ft-logo { font-size: 28px; font-weight: var(--w8); letter-spacing: -0.04em; color: var(--c300); display: flex; align-items: center; gap: .4em; }
+    .ft-logo-mark { width: auto; height: 58px; }
+    .ft-nav { display: flex; gap: 28px; flex-wrap: wrap; }
+    .ft-nav a { font-size: var(--t-body); font-weight: var(--w4); color: var(--t3); text-decoration: none; transition: color .25s; }
+    .ft-nav a:hover { color: var(--c300); }
+    .ft-bottom { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .ft-bottom span { font-size: var(--t-label); letter-spacing: .1em; color: rgba(122,155,142,.35); }
   </style>
 </head>
 <body>
@@ -295,10 +358,21 @@
 <div id="cur-dot"></div>
 <div id="cur-ring"></div>
 
-<nav class="nav">
-  <a class="nav-back" href="index.html">← 메인으로</a>
-  <span class="nav-logo">가입하기</span>
-</nav>
+<!-- HAMBURGER BUTTON -->
+<button id="menu-btn" aria-label="메뉴">
+  <span></span><span></span><span></span>
+</button>
+<div id="panel-backdrop"></div>
+<div id="side-panel">
+  <p class="sp-label">연대노동조합 · 2031</p>
+  <nav>
+    <a href="index.html" class="sp-link">메인</a>
+    <a href="ai.html" class="sp-link">AI 키우기</a>
+    <a href="community.html" class="sp-link">커뮤니티</a>
+    <a href="manifesto.html" class="sp-link">선언문</a>
+    <a href="join.html" class="sp-link">가입하기</a>
+  </nav>
+</div>
 
 <div class="page-wrap">
 
@@ -321,7 +395,7 @@
 
       <div class="left-quote" style="margin-top:40px;">
         "우리는 일자리를 잃었지만,<br>서로를 잃지 않는다."<br>
-        <span style="margin-top:8px;display:block;letter-spacing:.1em;">— 연대노동조합 창립 선언, 2047</span>
+        <span style="margin-top:8px;display:block;letter-spacing:.1em;">— 연대노동조합 창립 선언, 2031</span>
       </div>
     </div>
   </div>
@@ -413,7 +487,7 @@
           <div class="mc-label">Member No.</div>
           <div class="mc-no" id="mc-no">#3903</div>
           <div class="mc-name" id="mc-name">—</div>
-          <div class="mc-meta" id="mc-meta">연대노동조합 · 2047</div>
+          <div class="mc-meta" id="mc-meta">연대노동조합 · 2031</div>
         </div>
         <div class="done-actions">
           <a class="btn-primary" href="ai.html">아이에게 첫 마음 전하기 →</a>
@@ -424,6 +498,26 @@
     </div>
   </div>
 </div>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="ft-top">
+    <div class="ft-logo">
+      <img class="ft-logo-mark" src="logo.png" alt="AI-I Human Labor Union 로고" />
+    </div>
+    <nav class="ft-nav">
+      <a href="ai.html">AI 키우기</a>
+      <a href="community.html">커뮤니티</a>
+      <a href="manifesto.html">선언문</a>
+      <a href="join.html">가입하기</a>
+      <a href="index.html">← 메인으로</a>
+    </nav>
+  </div>
+  <div class="ft-bottom">
+    <span>© 연대노동조합 2031 — Solidarity Union</span>
+    <span>함께 키우는 세계</span>
+  </div>
+</footer>
 
 <script>
 /* ===== CURSOR ===== */
@@ -527,7 +621,7 @@ submitBtn.addEventListener('click', () => {
       const num = 3903 + Math.floor(Math.random()*40);
       document.getElementById('mc-no').textContent   = '#' + num;
       document.getElementById('mc-name').textContent = state.name;
-      document.getElementById('mc-meta').textContent = `전 ${state.job} · 연대노동조합 2047`;
+      document.getElementById('mc-meta').textContent = `전 ${state.job} · 연대노동조합 2031`;
       const dh = document.getElementById('done-h');
       dh.textContent = `${state.name} 님,\n연대의 일원이\n되었습니다`;
       dh.style.whiteSpace = 'pre-line';
@@ -572,6 +666,21 @@ function drawCanvas(t) {
   requestAnimationFrame(drawCanvas);
 }
 requestAnimationFrame(drawCanvas);
+</script>
+
+<script>
+/* ===== HAMBURGER MENU ===== */
+(function(){
+  const menuBtn = document.getElementById('menu-btn');
+  const sidePanel = document.getElementById('side-panel');
+  const panelBackdrop = document.getElementById('panel-backdrop');
+  if (!menuBtn) return;
+  function openMenu(){ menuBtn.classList.add('open'); sidePanel.classList.add('open'); panelBackdrop.classList.add('open'); }
+  function closeMenu(){ menuBtn.classList.remove('open'); sidePanel.classList.remove('open'); panelBackdrop.classList.remove('open'); }
+  menuBtn.addEventListener('click', () => menuBtn.classList.contains('open') ? closeMenu() : openMenu());
+  panelBackdrop.addEventListener('click', closeMenu);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+})();
 </script>
 </body>
 </html>
