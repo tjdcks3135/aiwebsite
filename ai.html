@@ -153,13 +153,18 @@
     .feed-card {
       position: relative;
       background: #FAF8F0;
-      border-radius: 20px;
-      padding: 32px 30px 28px;
+      width: min(600px, 94vw);
+      height: min(600px, 94vw);
+      border-radius: 50%;
+      margin: 0 auto;
+      padding: 64px 88px;
       box-shadow:
-        0 40px 100px rgba(0,0,0,.55),
-        0 12px 32px rgba(0,0,0,.3),
-        0 0 0 1px rgba(255,255,255,.05);
-      text-align: left;
+        0 40px 100px rgba(0,0,0,.6),
+        0 12px 32px rgba(0,0,0,.3);
+      text-align: center;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 16px;
+      overflow: hidden;
       transform-origin: center center;
     }
     @keyframes glass-melt {
@@ -179,65 +184,46 @@
     .feed-card.appearing {
       animation: card-appear 0.7s cubic-bezier(0,0,0.3,1) both;
     }
-    /* Subtle paper lines */
-    .feed-card::before {
-      content: '';
-      position: absolute; inset: 0; border-radius: 20px;
-      background: repeating-linear-gradient(
-        transparent, transparent 27px,
-        rgba(140,207,186,.07) 27px, rgba(140,207,186,.07) 28px
-      );
-      pointer-events: none;
-    }
     .feed-q {
-      font-size: var(--t-h3); font-weight: var(--w7);
-      letter-spacing: -0.02em; color: #1A2B24; margin-bottom: 22px;
-      position: relative;
+      font-size: 14px; font-weight: var(--w6);
+      letter-spacing: .04em; color: #7A9B8E;
     }
-    .emo-row { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 22px; position: relative; }
-    .emo {
-      padding: 9px 16px; border-radius: 100px;
-      border: 1px solid #B2E1D1; background: rgba(255,255,255,.65);
-      font-family: var(--f); font-size: var(--t-caption); font-weight: var(--w5);
-      color: #3D5449; cursor: none;
-      transition: all .25s var(--ease-out);
-    }
-    .emo:hover { border-color: #68BFA4; color: #1A2B24; background: #fff; }
-    .emo.on { background: #68BFA4; border-color: #68BFA4; color: #fff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(104,191,164,.3); }
-
     .feed-input {
-      width: 100%; min-height: 96px; resize: vertical;
-      background: rgba(255,255,255,.7);
-      border: 1px solid #C2DFD3; border-radius: 12px;
-      padding: 16px 18px; margin-bottom: 18px;
-      font-family: var(--f); font-size: var(--t-body); font-weight: var(--w4);
-      line-height: 1.75; color: #1A2B24;
+      width: 250px; height: 250px; flex-shrink: 0;
+      border-radius: 50%; overflow: hidden; resize: none;
+      background: rgba(255,255,255,.6);
+      border: 1px solid rgba(140,207,186,.45);
+      padding: 56px 42px;
+      font-family: var(--f); font-size: 14px; font-weight: var(--w4);
+      line-height: 1.85; color: #1A2B24; text-align: center;
       transition: border-color .3s ease, box-shadow .3s ease;
-      position: relative;
+      display: block;
     }
-    .feed-input::placeholder { color: #9BBCAE; }
-    .feed-input:focus { outline: none; border-color: #68BFA4; box-shadow: 0 0 0 3px rgba(104,191,164,.15); }
+    .feed-input::placeholder { color: #B2CDBF; }
+    .feed-input:focus { outline: none; border-color: rgba(104,191,164,.65); box-shadow: 0 0 0 4px rgba(104,191,164,.1); }
 
-    .feed-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; position: relative; }
+    .feed-foot {
+      display: flex; align-items: center; justify-content: center;
+      gap: 18px;
+    }
     .feed-count { font-size: var(--t-label); font-weight: var(--w3); letter-spacing: .1em; color: #9BBCAE; }
     .feed-send {
-      display: inline-flex; align-items: center; gap: 10px;
-      padding: 13px 28px; border-radius: 100px; border: none;
+      display: inline-flex; align-items: center;
+      padding: 10px 22px; border-radius: 100px; border: none;
       background: #1A2B24; color: #FAFCFB;
       font-family: var(--f); font-size: var(--t-label); font-weight: var(--w6);
-      letter-spacing: .22em; text-transform: uppercase; cursor: none;
+      letter-spacing: .2em; text-transform: uppercase; cursor: none;
       transition: background .3s ease, transform .3s var(--ease-out), opacity .3s ease;
     }
     .feed-send:hover:not(:disabled) { background: #2E8C72; transform: translateY(-2px); }
     .feed-send:disabled { opacity: .38; cursor: not-allowed; transform: none; }
 
-
-    /* thank-you overlay */
+    /* thank-you overlay — clipped to circle by parent overflow:hidden */
     .feed-thanks {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px;
       background: rgba(250,248,240,.94); backdrop-filter: blur(6px);
-      border-radius: 20px; opacity: 0; pointer-events: none;
+      opacity: 0; pointer-events: none;
       transition: opacity .45s ease;
       font-size: var(--t-h3); font-weight: var(--w7); color: #2E8C72;
       letter-spacing: -0.01em; text-align: center; padding: 20px;
@@ -354,22 +340,12 @@
 
     <!-- PAPER CARD -->
     <div class="feed-card" id="feed-card">
-      <div class="feed-q">지금, 어떤 마음인가요?</div>
-      <div class="emo-row" id="emo-row">
-        <button class="emo" data-emo="기쁨">기쁨</button>
-        <button class="emo" data-emo="슬픔">슬픔</button>
-        <button class="emo" data-emo="그리움">그리움</button>
-        <button class="emo" data-emo="두려움">두려움</button>
-        <button class="emo" data-emo="분노">분노</button>
-        <button class="emo" data-emo="평온">평온</button>
-        <button class="emo" data-emo="희망">희망</button>
-        <button class="emo" data-emo="외로움">외로움</button>
-      </div>
-      <textarea class="feed-input" id="feed-input" maxlength="280"
-        placeholder="아이에게 들려주고 싶은 이야기를 적어주세요. 오늘 있었던 일, 누군가의 기억, 전하고 싶은 마음 — 무엇이든 좋습니다."></textarea>
+      <div class="feed-q">아이에게 —</div>
+      <textarea class="feed-input" id="feed-input" maxlength="300"
+        placeholder="오늘 전하고 싶은 이야기를 써주세요."></textarea>
       <div class="feed-foot">
-        <span class="feed-count"><span id="char-count">0</span> / 280</span>
-        <button class="feed-send" id="feed-send" disabled>아이에게 전하기 →</button>
+        <span class="feed-count"><span id="char-count">0</span> / 300</span>
+        <button class="feed-send" id="feed-send" disabled>전하기 →</button>
       </div>
       <div class="feed-thanks" id="feed-thanks">
         전해졌어요
@@ -409,9 +385,9 @@
     <h2 class="page-title" style="margin-top:18px;font-size:var(--t-h2);">아이가 듣고 있어요</h2>
   </div>
   <div class="whisper-list" id="whisper-list">
-    <div class="whisper"><span class="w-emo">그리움</span><br>비 오는 날이면 돌아가신 어머니의 손맛이 생각나요. 김치전 부치던 그 소리를 아이도 알았으면 해요.</div>
-    <div class="whisper"><span class="w-emo">희망</span><br>일자리는 잃었지만, 매일 아침 같은 조끼를 입은 사람들과 인사해요. 우리는 아직 여기 있어요.</div>
-    <div class="whisper"><span class="w-emo">평온</span><br>오늘은 아무 일도 없었어요. 그게 얼마나 다행인지, 아이는 알까요.</div>
+    <div class="whisper">비 오는 날이면 돌아가신 어머니의 손맛이 생각나요. 김치전 부치던 그 소리를 아이도 알았으면 해요.</div>
+    <div class="whisper">일자리는 잃었지만, 매일 아침 같은 조끼를 입은 사람들과 인사해요. 우리는 아직 여기 있어요.</div>
+    <div class="whisper">오늘은 아무 일도 없었어요. 그게 얼마나 다행인지, 아이는 알까요.</div>
   </div>
 </section>
 
@@ -445,7 +421,7 @@ addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
   ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
   requestAnimationFrame(curLoop);
 })();
-document.querySelectorAll('a, button, .emo').forEach(el => {
+document.querySelectorAll('a, button').forEach(el => {
   el.addEventListener('mouseenter', () => ring.classList.add('is-hover'));
   el.addEventListener('mouseleave', () => ring.classList.remove('is-hover'));
 });
@@ -479,45 +455,36 @@ new ResizeObserver(() => {
   }
 }).observe(canvas);
 
-// Aurora layer config: [rgb, yFrac, ampFrac, freq, speed, maxAlpha]
-// Deeper, more layered for a frosted-glass look
-const AURORA_LAYERS = [
-  [[36,  120,  96], 0.22, 0.26, 0.0014, 0.00016, 0.38],  // deep base
-  [[68,  170, 140], 0.44, 0.20, 0.0022, 0.00024, 0.26],  // mid teal
-  [[120, 200, 176], 0.60, 0.16, 0.0032, 0.00034, 0.18],  // soft mint
-  [[100, 160, 200], 0.34, 0.18, 0.0018, 0.00020, 0.14],  // cool blue accent
-  [[148, 110, 185], 0.50, 0.12, 0.0028, 0.00030, 0.08],  // lavender depth
+// Floating glow config: [xBase, yBase, xAmp, yAmp, xFreq, yFreq, r, g, b, alpha, sizeBase, sizePulse]
+const GLOWS = [
+  [0.32, 0.48, 0.22, 0.18, 0.000138, 0.000110,  46, 160, 120, 0.42, 0.58, 0.10],
+  [0.68, 0.38, 0.18, 0.24, 0.000162, 0.000128, 100, 188, 162, 0.30, 0.52, 0.08],
+  [0.50, 0.62, 0.26, 0.17, 0.000118, 0.000152,  72, 148, 204, 0.19, 0.46, 0.07],
+  [0.22, 0.28, 0.14, 0.22, 0.000152, 0.000098, 142, 104, 188, 0.13, 0.42, 0.06],
+  [0.80, 0.58, 0.17, 0.20, 0.000130, 0.000142,  58, 180, 148, 0.22, 0.50, 0.08],
 ];
 
 function aurora(ts) {
   const W = canvas.width, H = canvas.height;
   if (!W || !H) { requestAnimationFrame(aurora); return; }
 
-  ctx.fillStyle = '#192820';
+  ctx.fillStyle = '#0E1C12';
   ctx.fillRect(0, 0, W, H);
 
-  for (const [[r,g,b], yFrac, ampFrac, freq, speed, maxA] of AURORA_LAYERS) {
-    const yC = H * yFrac;
-    const amp = H * ampFrac;
+  for (const [xB, yB, xA, yA, xF, yF, r, g, b, a, sB, sP] of GLOWS) {
+    const cx = W * (xB + Math.sin(ts * xF + xB * 6.3) * xA
+                       + Math.sin(ts * xF * 1.73 + 1.27) * xA * 0.32);
+    const cy = H * (yB + Math.cos(ts * yF + yB * 5.1) * yA
+                       + Math.cos(ts * yF * 1.41 + 2.09) * yA * 0.38);
+    const size = (sB + Math.sin(ts * 0.000082 + xB * 4.2) * sP) * Math.max(W, H);
 
-    ctx.beginPath();
-    for (let x = 0; x <= W; x += 5) {
-      const y = yC
-        + Math.sin(x * freq + ts * speed) * amp
-        + Math.sin(x * freq * 2.4 + ts * speed * 1.65 + 1.5) * amp * 0.40
-        + Math.cos(x * freq * 0.55 - ts * speed * 0.68 + 2.9) * amp * 0.27;
-      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-    ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
-
-    const grad = ctx.createLinearGradient(0, yC - amp * 1.8, 0, yC + amp * 1.8);
-    grad.addColorStop(0,    `rgba(${r},${g},${b},0)`);
-    grad.addColorStop(0.28, `rgba(${r},${g},${b},${+(maxA * 0.35).toFixed(3)})`);
-    grad.addColorStop(0.50, `rgba(${r},${g},${b},${+maxA.toFixed(3)})`);
-    grad.addColorStop(0.72, `rgba(${r},${g},${b},${+(maxA * 0.50).toFixed(3)})`);
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, size);
+    grad.addColorStop(0,    `rgba(${r},${g},${b},${a})`);
+    grad.addColorStop(0.30, `rgba(${r},${g},${b},${+(a * 0.52).toFixed(3)})`);
+    grad.addColorStop(0.65, `rgba(${r},${g},${b},${+(a * 0.12).toFixed(3)})`);
     grad.addColorStop(1,    `rgba(${r},${g},${b},0)`);
     ctx.fillStyle = grad;
-    ctx.fill();
+    ctx.fillRect(0, 0, W, H);
   }
 
   // Draw glass-absorption pulses: slow, warm, diffuse — like heat through frosted glass
@@ -565,26 +532,17 @@ function spawnAbsorptionPulse() {
 
 
 /* ===== INPUT LOGIC ===== */
-const emoRow    = document.getElementById('emo-row');
 const input     = document.getElementById('feed-input');
 const sendBtn   = document.getElementById('feed-send');
 const charCount = document.getElementById('char-count');
 const counterEl = document.getElementById('counter');
 const thanks    = document.getElementById('feed-thanks');
 const whisperList = document.getElementById('whisper-list');
-let chosenEmo = null;
 let count = 102418;
 let isSending = false;
 
-emoRow.addEventListener('click', e => {
-  const b = e.target.closest('.emo'); if (!b) return;
-  emoRow.querySelectorAll('.emo').forEach(x => x.classList.remove('on'));
-  b.classList.add('on');
-  chosenEmo = b.dataset.emo;
-  updateSend();
-});
 input.addEventListener('input', () => { charCount.textContent = input.value.length; updateSend(); });
-function updateSend() { sendBtn.disabled = !(chosenEmo && input.value.trim().length > 0) || isSending; }
+function updateSend() { sendBtn.disabled = !input.value.trim().length || isSending; }
 
 /* ===== SEND: CARD DISSOLVE ===== */
 sendBtn.addEventListener('click', () => {
@@ -593,7 +551,6 @@ sendBtn.addEventListener('click', () => {
   sendBtn.disabled = true;
 
   const text = input.value.trim();
-  const emo = chosenEmo;
   const card = document.getElementById('feed-card');
 
   // Spawn aurora absorption pulse immediately
@@ -615,14 +572,12 @@ sendBtn.addEventListener('click', () => {
     // Prepend new whisper
     const w = document.createElement('div');
     w.className = 'whisper fresh';
-    w.innerHTML = `<span class="w-emo">${emo}</span><br>${text.replace(/</g, '&lt;')}`;
+    w.innerHTML = text.replace(/</g, '&lt;');
     whisperList.insertBefore(w, whisperList.firstChild);
     while (whisperList.children.length > 6) whisperList.removeChild(whisperList.lastChild);
 
     // Reset form while invisible
     input.value = ''; charCount.textContent = '0';
-    emoRow.querySelectorAll('.emo').forEach(x => x.classList.remove('on'));
-    chosenEmo = null;
 
     // Phase 2: re-materialise card after thank-you
     setTimeout(() => {
