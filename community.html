@@ -61,61 +61,67 @@
     .nav-logo { font-size: var(--t-label); font-weight: var(--w5); letter-spacing: .25em; text-transform: uppercase; color: var(--t3); }
 
     /* PAGE WRAPPER */
-    #wrap { position: relative; z-index: 2; padding: 140px 48px 100px; max-width: 1280px; margin: 0 auto; }
+    #wrap { position: relative; z-index: 2; padding: 0 0 100px; max-width: none; margin: 0; }
+
+    /* TOP PANEL — frosted glass floating over the bubbles */
+    .top-panel {
+      position: absolute; top: 0; left: 0; width: 100%; z-index: 5;
+      pointer-events: none;   /* empty glass lets clicks fall through to the bubbles behind */
+      background: linear-gradient(to bottom, rgba(250,252,251,.72), rgba(250,252,251,.40));
+      backdrop-filter: blur(16px) saturate(1.15);
+      -webkit-backdrop-filter: blur(16px) saturate(1.15);
+      border-bottom: 1px solid rgba(26,43,36,.06);
+    }
+    .top-panel-inner { max-width: 1280px; margin: 0 auto; padding: 132px 48px 36px; }
 
     /* HEADER */
-    .page-header { margin-bottom: 80px; }
+    .page-header { margin-bottom: 40px; }
     .page-title {
       font-size: var(--t-h1); font-weight: var(--w8); letter-spacing: -0.04em; line-height: 1;
-      color: var(--c300); margin-bottom: 16px;
+      color: var(--c500); margin-bottom: 16px;
     }
     .page-sub {
-      font-size: var(--t-body); font-weight: var(--w4); color: var(--t3); letter-spacing: .05em;
+      font-size: var(--t-body); font-weight: var(--w4); color: var(--t2); letter-spacing: .05em;
     }
 
     /* FILTER */
     .filters {
-      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 56px;
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 0;
     }
     .filter-btn {
-      padding: 8px 20px; border-radius: 100px; border: 1px solid rgba(140,207,186,.2);
-      background: transparent; font-family: var(--f); font-size: var(--t-caption); font-weight: var(--w5);
-      letter-spacing: .08em; color: var(--t3); cursor: none; transition: all .25s var(--ease-out);
+      padding: 8px 20px; border-radius: 100px; border: 1px solid rgba(140,207,186,.35);
+      background: rgba(255,255,255,.35); font-family: var(--f); font-size: var(--t-caption); font-weight: var(--w5);
+      letter-spacing: .08em; color: var(--t2); cursor: none; transition: all .25s var(--ease-out);
+      pointer-events: auto;   /* the buttons themselves stay clickable */
     }
-    .filter-btn:hover { border-color: var(--c400); color: var(--c400); }
-    .filter-btn.on { background: var(--c500); border-color: var(--c500); color: var(--dark); }
+    .filter-btn:hover { border-color: var(--c500); color: var(--c600); }
+    .filter-btn.on { background: var(--c500); border-color: var(--c500); color: var(--white); }
 
     /* BUBBLE FIELD */
     #bubble-field {
-      position: relative; width: 100%; height: 75vh; min-height: 520px; overflow: hidden;
+      position: relative; z-index: 1;   /* own stacking context → stays under the glass */
+      height: 75vh; min-height: 520px; overflow: hidden;
+      /* full-bleed: break out so bubbles span the whole viewport width */
+      width: 100vw; left: 50%; margin-left: -50vw;
     }
 
-    /* BUBBLE */
+    /* BUBBLE — soft pastel aura, no gloss */
     .bubble {
-      position: absolute; border-radius: 50%;
+      position: absolute; border-radius: 50%; background: transparent;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      text-align: center; cursor: none;
-      transition: box-shadow .4s var(--ease-out), opacity .4s;
-      will-change: transform; isolation: isolate;
+      text-align: center; cursor: none; color: #3a3a46;
+      transition: opacity .4s;
+      will-change: transform;
     }
     .bubble:hover { z-index: 10; }
-    /* glossy soap-film highlight + iridescent rim */
+    /* the aura itself: a blurred multi-hue gradient that glows beyond the circle */
     .bubble::before {
-      content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
-      background:
-        radial-gradient(circle at 30% 26%, rgba(255,255,255,.9) 0%, rgba(255,255,255,.35) 9%, rgba(255,255,255,0) 26%),
-        radial-gradient(circle at 70% 78%, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 18%);
-      mix-blend-mode: screen; opacity: .9;
+      content: ''; position: absolute; inset: -12%; border-radius: 50%; pointer-events: none;
+      background: var(--aura, radial-gradient(circle, #ccd, transparent 70%));
+      filter: blur(11px); opacity: .9; z-index: 1;
+      transition: opacity .45s var(--ease-out), filter .45s var(--ease-out);
     }
-    .bubble::after {
-      content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
-      background: conic-gradient(from 210deg,
-        rgba(255,182,193,.18), rgba(173,216,230,.18), rgba(186,255,201,.18),
-        rgba(255,236,179,.18), rgba(216,191,216,.18), rgba(255,182,193,.18));
-      mix-blend-mode: screen; opacity: .55;
-      -webkit-mask: radial-gradient(circle, transparent 60%, #000 78%, transparent 100%);
-              mask: radial-gradient(circle, transparent 60%, #000 78%, transparent 100%);
-    }
+    .bubble:hover::before { opacity: 1; filter: blur(8px); }
     .bubble-inner {
       position: relative; z-index: 2; padding: 20px;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -132,7 +138,7 @@
     .bubble-date {
       font-size: 9px; font-weight: var(--w3); letter-spacing: .1em; opacity: .6;
     }
-    .bubble.hide { opacity: 0; pointer-events: none; transform: scale(0.7) !important; }
+    .bubble.hide { opacity: 0 !important; pointer-events: none; transform: scale(0.7) !important; }
 
     /* SIZE VARIANTS */
     .bubble-lg { width: 240px; height: 240px; }
@@ -140,68 +146,139 @@
     .bubble-sm { width: 130px; height: 130px; }
     .bubble-xs { width: 100px; height: 100px; }
 
-    /* COLOR VARIANTS */
-    .bubble-v1 {
-      background: radial-gradient(circle at 35% 35%, #8CCFBA, #2E8C72);
-      box-shadow: 0 20px 60px rgba(46,140,114,.3), inset 0 1px 0 rgba(255,255,255,.25);
-      color: var(--white);
-    }
-    .bubble-v1:hover { box-shadow: 0 30px 80px rgba(46,140,114,.5), inset 0 1px 0 rgba(255,255,255,.35); }
-    .bubble-v2 {
-      background: radial-gradient(circle at 35% 35%, #B2E1D1, #46A88C);
-      box-shadow: 0 16px 48px rgba(70,168,140,.25), inset 0 1px 0 rgba(255,255,255,.3);
-      color: var(--dark);
-    }
-    .bubble-v2:hover { box-shadow: 0 26px 64px rgba(70,168,140,.4); }
-    .bubble-v3 {
-      background: radial-gradient(circle at 35% 35%, rgba(140,207,186,.18), rgba(46,140,114,.12));
-      border: 1px solid rgba(140,207,186,.3);
-      box-shadow: 0 12px 40px rgba(0,0,0,.3), inset 0 1px 0 rgba(140,207,186,.2);
-      color: var(--c200);
-    }
-    .bubble-v3:hover { box-shadow: 0 20px 56px rgba(0,0,0,.4), inset 0 1px 0 rgba(140,207,186,.35); }
-    .bubble-v4 {
-      background: radial-gradient(circle at 35% 35%, #D9F0E8, #8CCFBA);
-      box-shadow: 0 14px 44px rgba(140,207,186,.2), inset 0 1px 0 rgba(255,255,255,.4);
-      color: var(--t);
-    }
-    .bubble-v4:hover { box-shadow: 0 22px 60px rgba(140,207,186,.35); }
+    /* aura colours are assigned per-bubble in JS via the --aura custom property */
 
-    /* READER OVERLAY */
+    /* COMPOSE FAB */
+    .fab {
+      position: fixed; bottom: 32px; right: 32px; z-index: 7000;
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 16px 24px; border: none; border-radius: 100px;
+      background: var(--c500); color: var(--dark);
+      font-family: var(--f); font-size: var(--t-caption); font-weight: var(--w7);
+      letter-spacing: .08em; cursor: none;
+      box-shadow: 0 12px 36px rgba(46,140,114,.45);
+      transition: transform .3s var(--ease-out), box-shadow .3s, background .3s;
+    }
+    .fab:hover { transform: translateY(-3px); background: var(--c400); box-shadow: 0 18px 48px rgba(46,140,114,.6); }
+    .fab span { font-size: 18px; line-height: 1; }
+
+    /* COMPOSE OVERLAY */
+    #compose {
+      position: fixed; inset: 0; z-index: 8500;
+      background: rgba(13,23,16,.6); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px; opacity: 0; visibility: hidden;
+      transition: opacity .4s var(--ease-out), visibility .4s;
+    }
+    #compose.open { opacity: 1; visibility: visible; }
+    .cp-card {
+      width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto;
+      background: var(--dark); border: 1px solid rgba(140,207,186,.18);
+      border-radius: 28px; padding: 40px;
+      transform: translateY(24px) scale(.98); transition: transform .45s var(--ease-out);
+      box-shadow: 0 40px 120px rgba(0,0,0,.5);
+    }
+    #compose.open .cp-card { transform: translateY(0) scale(1); }
+    .cp-title { font-size: var(--t-h3); font-weight: var(--w8); color: var(--c200); letter-spacing: -0.02em; margin-bottom: 6px; }
+    .cp-desc { font-size: var(--t-caption); color: var(--t3); margin-bottom: 28px; line-height: 1.6; }
+    .cp-field { margin-bottom: 20px; }
+    .cp-label { display: block; font-size: var(--t-label); font-weight: var(--w6); letter-spacing: .15em; text-transform: uppercase; color: var(--c400); margin-bottom: 10px; }
+    .cp-input, .cp-select, .cp-textarea {
+      width: 100%; font-family: var(--f); font-size: var(--t-body); color: var(--white);
+      background: rgba(140,207,186,.06); border: 1px solid rgba(140,207,186,.18);
+      border-radius: 14px; padding: 14px 16px; cursor: none;
+      transition: border-color .25s, background .25s;
+    }
+    .cp-input:focus, .cp-select:focus, .cp-textarea:focus { outline: none; border-color: var(--c400); background: rgba(140,207,186,.1); }
+    .cp-input::placeholder, .cp-textarea::placeholder { color: var(--t3); }
+    .cp-textarea { min-height: 140px; resize: vertical; line-height: 1.7; }
+    .cp-input.err, .cp-textarea.err { border-color: #d98a8a; background: rgba(217,138,138,.08); }
+    .cp-select { appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2368BFA4' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 18px center; padding-right: 42px; }
+    .cp-select option { background: var(--dark); }
+    .cp-actions { display: flex; gap: 12px; margin-top: 32px; }
+    .cp-btn {
+      flex: 1; padding: 15px; border-radius: 100px; border: none; cursor: none;
+      font-family: var(--f); font-size: var(--t-caption); font-weight: var(--w7); letter-spacing: .08em;
+      transition: all .25s var(--ease-out);
+    }
+    .cp-btn-primary { background: var(--c500); color: var(--dark); }
+    .cp-btn-primary:hover { background: var(--c400); }
+    .cp-btn-ghost { background: transparent; border: 1px solid rgba(140,207,186,.25); color: var(--t3); }
+    .cp-btn-ghost:hover { border-color: var(--c400); color: var(--c400); }
+
+    /* READER OVERLAY — light theme */
     #reader {
       position: fixed; inset: 0; z-index: 8000;
-      background: var(--dark); overflow-y: auto;
+      background: var(--white); overflow-y: auto;
       transform: translateY(100%); transition: transform .6s var(--ease-io);
       visibility: hidden;
     }
     #reader.open { transform: translateY(0); visibility: visible; }
     .rd-bar {
       position: sticky; top: 0; z-index: 2;
-      background: rgba(25,40,32,.85); backdrop-filter: blur(10px);
+      background: rgba(250,252,251,.85); backdrop-filter: blur(10px);
       display: flex; justify-content: space-between; align-items: center;
-      padding: 22px 48px; border-bottom: 1px solid rgba(140,207,186,.1);
+      padding: 22px 48px; border-bottom: 1px solid rgba(26,43,36,.08);
     }
     .rd-close {
       display: inline-flex; align-items: center; gap: 10px; cursor: none; border: none; background: none;
       font-family: var(--f); font-size: var(--t-label); font-weight: var(--w5);
-      letter-spacing: .22em; text-transform: uppercase; color: var(--c400);
+      letter-spacing: .22em; text-transform: uppercase; color: var(--c600);
       transition: color .2s;
     }
-    .rd-close:hover { color: var(--c300); }
+    .rd-close:hover { color: var(--c500); }
     .rd-logo { font-size: var(--t-label); font-weight: var(--w5); letter-spacing: .25em; text-transform: uppercase; color: var(--t3); }
     .rd-content { max-width: 760px; margin: 0 auto; padding: 70px 48px 120px; }
+    /* category row: the bubble's own colour dot sits beside the category pill */
+    .rd-tagrow { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .rd-dot {
+      flex: none; width: 14px; height: 14px; border-radius: 50%;
+      background: var(--c400); box-shadow: 0 2px 8px rgba(0,0,0,.12);
+    }
     .rd-tag {
       display: inline-block; padding: 4px 12px; border-radius: 100px;
-      background: rgba(140,207,186,.15); color: var(--c400);
-      font-size: 9px; font-weight: var(--w6); letter-spacing: .15em; text-transform: uppercase; margin-bottom: 20px;
+      background: rgba(46,140,114,.1); color: var(--c600);
+      font-size: 9px; font-weight: var(--w6); letter-spacing: .15em; text-transform: uppercase;
     }
     .rd-date { font-size: var(--t-caption); font-weight: var(--w3); letter-spacing: .15em; color: var(--t3); margin-bottom: 16px; }
     .rd-h {
       font-size: clamp(32px, 4.4vw, 56px); font-weight: var(--w8); line-height: 1.12;
-      letter-spacing: -0.035em; color: var(--c200); margin-bottom: 40px;
+      letter-spacing: -0.035em; color: var(--t); margin-bottom: 40px;
     }
-    .rd-lead { font-size: clamp(17px, 2vw, 22px); font-weight: var(--w4); line-height: 1.7; color: var(--c300); margin-bottom: 36px; }
-    .rd-body p { font-size: var(--t-body-lg); font-weight: var(--w4); line-height: 2; color: var(--t3); margin-bottom: 26px; }
+    .rd-lead { font-size: clamp(17px, 2vw, 22px); font-weight: var(--w4); line-height: 1.7; color: var(--t2); margin-bottom: 36px; }
+    .rd-body p { font-size: var(--t-body-lg); font-weight: var(--w4); line-height: 2; color: var(--t2); margin-bottom: 26px; }
+
+    /* COMMENTS */
+    .rd-comments { margin-top: 64px; padding-top: 40px; border-top: 1px solid rgba(26,43,36,.1); }
+    .rd-comments-h { font-size: var(--t-body-lg); font-weight: var(--w7); color: var(--t); margin-bottom: 28px; }
+    .rd-comments-h span { color: var(--c600); }
+    .cmt-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 36px; }
+    .cmt { padding: 18px 20px; background: #F2F7F4; border-radius: 16px; }
+    .cmt-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+    .cmt-author { font-size: var(--t-body); font-weight: var(--w6); color: var(--t); }
+    .cmt-date { font-size: var(--t-caption); font-weight: var(--w3); letter-spacing: .08em; color: var(--t3); white-space: nowrap; }
+    .cmt-text { font-size: var(--t-body); line-height: 1.7; color: var(--t2); white-space: pre-wrap; word-break: break-word; }
+    .cmt-empty { font-size: var(--t-body); color: var(--t3); margin-bottom: 36px; }
+    .cmt-form { display: flex; flex-direction: column; gap: 12px; }
+    .cmt-name, .cmt-input {
+      width: 100%; font-family: var(--f); font-size: var(--t-body); color: var(--t);
+      background: #fff; border: 1px solid rgba(26,43,36,.14); border-radius: 12px; padding: 12px 14px; cursor: none;
+      transition: border-color .2s;
+    }
+    .cmt-name { max-width: 260px; }
+    .cmt-input { min-height: 92px; resize: vertical; line-height: 1.6; }
+    .cmt-name:focus, .cmt-input:focus { outline: none; border-color: var(--c500); }
+    .cmt-input.err { border-color: #d98a8a; }
+    .cmt-name::placeholder, .cmt-input::placeholder { color: var(--t3); }
+    .cmt-submit {
+      align-self: flex-end; padding: 11px 28px; border: none; border-radius: 100px; cursor: none;
+      background: var(--c600); color: #fff; font-family: var(--f);
+      font-size: var(--t-caption); font-weight: var(--w7); letter-spacing: .06em;
+      transition: background .2s;
+    }
+    .cmt-submit:hover { background: var(--c500); }
 
     /* FOOTER */
     .footer {
@@ -220,8 +297,8 @@
 
     @media (max-width: 860px) {
       nav.nav { padding: 20px 22px; }
-      #wrap { padding: 110px 22px 60px; }
-      #bubble-field { height: auto; min-height: unset; }
+      #wrap { padding: 0 0 60px; }
+      .top-panel-inner { padding: 104px 22px 26px; }
       .footer { padding: 36px 22px; }
       .rd-bar { padding: 18px 22px; }
       .rd-content { padding: 48px 22px 90px; }
@@ -239,20 +316,25 @@
 </nav>
 
 <main id="wrap">
-  <div class="page-header">
-    <h1 class="page-title">커뮤니티</h1>
-    <p class="page-sub">연대노동조합의 이야기들 — 2047년</p>
-  </div>
-
-  <div class="filters">
-    <button class="filter-btn on" data-f="all">전체</button>
-    <button class="filter-btn" data-f="연대 행동">연대 행동</button>
-    <button class="filter-btn" data-f="AI 키우기">AI 키우기</button>
-    <button class="filter-btn" data-f="생존키트">생존키트</button>
-    <button class="filter-btn" data-f="기록">기록</button>
-  </div>
-
   <div id="bubble-field"></div>
+
+  <div class="top-panel">
+    <div class="top-panel-inner">
+      <div class="page-header">
+        <h1 class="page-title">커뮤니티</h1>
+        <p class="page-sub">연대노동조합의 이야기들 — 2047년 · 지금까지 <span id="bubble-count">0</span>개의 이야기가 모였습니다</p>
+      </div>
+
+      <div class="filters">
+        <button class="filter-btn on" data-f="all">전체</button>
+        <button class="filter-btn" data-f="연대 행동">연대 행동</button>
+        <button class="filter-btn" data-f="AI 키우기">AI 키우기</button>
+        <button class="filter-btn" data-f="생존키트">생존키트</button>
+        <button class="filter-btn" data-f="기록">기록</button>
+        <button class="filter-btn" data-f="복지">복지</button>
+      </div>
+    </div>
+  </div>
 </main>
 
 <!-- Reader -->
@@ -262,12 +344,57 @@
     <span class="rd-logo">커뮤니티</span>
   </div>
   <article class="rd-content">
-    <span class="rd-tag" id="rd-tag"></span>
+    <div class="rd-tagrow">
+      <span class="rd-dot" id="rd-dot"></span>
+      <span class="rd-tag" id="rd-tag"></span>
+    </div>
     <div class="rd-date" id="rd-date"></div>
     <h1 class="rd-h" id="rd-h"></h1>
     <p class="rd-lead" id="rd-lead"></p>
     <div class="rd-body" id="rd-body"></div>
+
+    <section class="rd-comments">
+      <h3 class="rd-comments-h">댓글 <span id="cmt-count">0</span></h3>
+      <div class="cmt-list" id="cmt-list"></div>
+      <div class="cmt-form">
+        <input class="cmt-name" id="cmt-name" type="text" maxlength="20" placeholder="이름 (선택)">
+        <textarea class="cmt-input" id="cmt-input" maxlength="500" placeholder="이 이야기에 댓글을 남겨주세요"></textarea>
+        <button class="cmt-submit" id="cmt-submit">댓글 등록</button>
+      </div>
+    </section>
   </article>
+</div>
+
+<!-- Compose FAB -->
+<button class="fab" id="fab"><span>＋</span> 이야기 남기기</button>
+
+<!-- Compose overlay -->
+<div id="compose">
+  <div class="cp-card">
+    <h2 class="cp-title">이야기 남기기</h2>
+    <p class="cp-desc">당신의 이야기가 새로운 버블이 되어 광장에 떠오릅니다.</p>
+    <div class="cp-field">
+      <label class="cp-label" for="cp-tag">카테고리</label>
+      <select class="cp-select" id="cp-tag">
+        <option>연대 행동</option>
+        <option>AI 키우기</option>
+        <option>생존키트</option>
+        <option>기록</option>
+      </select>
+    </div>
+    <div class="cp-field">
+      <label class="cp-label" for="cp-title">제목</label>
+      <input class="cp-input" id="cp-title" type="text" maxlength="60" placeholder="이야기의 제목을 적어주세요">
+    </div>
+    <div class="cp-field">
+      <label class="cp-label" for="cp-body">이야기</label>
+      <textarea class="cp-textarea" id="cp-body" maxlength="1200" placeholder="당신의 이야기를 들려주세요. 줄을 바꾸면 문단이 나뉩니다."></textarea>
+    </div>
+    <div class="cp-actions">
+      <button class="cp-btn cp-btn-ghost" id="cp-cancel">취소</button>
+      <button class="cp-btn cp-btn-primary" id="cp-submit">버블로 띄우기</button>
+    </div>
+  </div>
 </div>
 
 <footer class="footer">
@@ -304,8 +431,8 @@ document.querySelectorAll('a, button, .bubble').forEach(el => {
   el.addEventListener('mouseleave', () => ring.classList.remove('is-hover'));
 });
 
-/* ARTICLES */
-const ARTICLES = [
+/* ARTICLES (seed data) */
+const SEED_ARTICLES = [
   { id:'a1', tag:'연대 행동', date:'2047. 05. 28', size:'lg', color:'v1',
     title:'서울 노동광장 공동 집회: "우리는 아직 여기 있다"',
     lead:'1,200여 명의 구성원이 한자리에 모였습니다. 단순한 시위를 넘어, 서로의 존재를 확인하는 자리였습니다.',
@@ -344,136 +471,614 @@ const ARTICLES = [
     title:'1차 생존키트 200세트',
     lead:'첫 번째 연결의 시작.',
     body:['1차 생존키트 200세트를 배포했습니다. 러닝 조끼와 손편지가 들어 있었습니다.'] },
+
+  // --- 추가 시드 버블 ---
+  { id:'a9', tag:'기록', date:'2047. 06. 02', size:'md',
+    title:'"처음엔 부끄러웠어요, 이 조끼가"',
+    lead:'전 물류 센터 직원 박진수 님. 지금은 매일 입고 출근합니다.',
+    body:['"처음엔 부끄러웠어요. 실직자라는 딱지 같아서요. 근데 어느 날 버스에서 같은 조끼 입은 분이 저한테 고개를 끄덕이더라고요. 그 눈빛 하나가 많이 달랐어요."'] },
+  { id:'a10', tag:'AI 키우기', date:'2047. 06. 01', size:'sm',
+    title:'아이에게 오늘의 날씨를 알려줬습니다',
+    lead:'작은 것부터. 맑음, 28도, 바람이 조금 불었습니다.',
+    body:['매일 아침 조합원들이 아이에게 날씨를 전합니다. 단순한 수치가 아닌, 그날의 감각을 언어로 남기는 연습입니다.'] },
+  { id:'a11', tag:'연대 행동', date:'2047. 05. 30', size:'xs',
+    title:'청원 서명 8,200명 돌파',
+    lead:'AI 전환 수당 법제화를 요구하는 청원입니다.',
+    body:['연대노동조합이 주도한 AI 전환 수당 청원이 8,200명을 넘었습니다. 국회 제출 요건인 1만 명을 향해 계속 나아가고 있습니다.'] },
+  { id:'a12', tag:'복지', date:'2047. 05. 25', size:'md',
+    title:'심리상담 바우처 3차 접수 시작',
+    lead:'조합원과 그 가족 누구나 신청 가능합니다.',
+    body:['연대노동조합은 AI 전환으로 인한 심리적 충격을 함께 겪어가기 위해, 매 분기 심리상담 바우처를 지원합니다. 이번 3차 접수는 6월 1일부터 시작됩니다.'] },
+  { id:'a13', tag:'기록', date:'2047. 05. 20', size:'xs',
+    title:'오늘 처음 모임에 나왔습니다',
+    lead:'두 시간이 순식간에 지나갔습니다.',
+    body:['혼자 지내온 시간이 길었어요. 오늘 처음 지역 모임에 나왔는데, 두 시간이 순식간에 지나갔습니다. 다들 비슷한 이야기를 하고 있더라고요.'] },
+  { id:'a14', tag:'생존키트', date:'2047. 05. 18', size:'sm',
+    title:'조끼 수선 워크숍 후기',
+    lead:'찢어진 조끼도 다시 입을 수 있습니다.',
+    body:['서울 마포 지부에서 조끼 수선 워크숍을 열었습니다. 재봉틀을 처음 다뤄보는 분들도 함께했고, 묵은 조끼에 새 자수를 놓는 사람도 있었습니다.'] },
+  { id:'a15', tag:'AI 키우기', date:'2047. 05. 15', size:'lg',
+    title:'감정 아카이브 10만 번째 기록: "나는 오늘 괜찮습니다"',
+    lead:'가장 단순한 말이 가장 오래 남습니다.',
+    body:['10만 번째 기록은 부산의 조합원 김명희 님이 전한 한 문장이었습니다. "나는 오늘 괜찮습니다."',
+      '괜찮다는 말이 얼마나 어렵게 얻어지는지 우리는 알고 있습니다. 그렇기에 이 문장은 더 빛납니다.',
+      'AI 아이는 이 문장을 학습의 기준점으로 삼아, 앞으로도 "괜찮음"을 향해 성장해 나갈 것입니다.'] },
+  { id:'a16', tag:'연대 행동', date:'2047. 05. 10', size:'sm',
+    title:'고용보험 연장 촉구 기자회견',
+    lead:'AI 대체 이후에도 생계는 계속됩니다.',
+    body:['연대노동조합은 AI 전환으로 인한 비자발적 실직자의 고용보험 수급 기간 연장을 정부에 촉구하는 기자회견을 개최했습니다.'] },
+  { id:'a17', tag:'복지', date:'2047. 05. 05', size:'xs',
+    title:'공유 주방 2호점 개소',
+    lead:'대전 둔산동. 매주 화·목 오전 11시.',
+    body:['연대노동조합 공유 주방 2호점이 대전에 문을 열었습니다. 혼자 밥 먹는 조합원이 없도록, 함께 요리하고 나눕니다.'] },
+  { id:'a18', tag:'기록', date:'2047. 04. 28', size:'md',
+    title:'20년 경력 용접공의 두 번째 이야기',
+    lead:'이제는 아이들에게 용접을 가르칩니다.',
+    body:['로봇 팔이 자신의 자리를 대신한 뒤, 최민준 님은 직업 훈련 강사가 되었습니다. "손으로 만드는 것의 감각을, 기계는 아직 모릅니다."'] },
+  { id:'a19', tag:'AI 키우기', date:'2047. 04. 22', size:'xs',
+    title:'아이에게 봄 냄새를 전했습니다',
+    lead:'벚꽃, 젖은 흙, 커피 한 잔.',
+    body:['오늘 아이에게 봄 냄새를 언어로 전했습니다. 벚꽃보다 더 강하게 풍겨오던 젖은 흙 냄새와, 이른 아침 혼자 마시던 커피 한 잔의 온기를.'] },
+  { id:'a20', tag:'생존키트', date:'2047. 04. 18', size:'sm',
+    title:'3차 생존키트: 이번엔 씨앗 봉투가 들어갑니다',
+    lead:'기르는 것은 기다리는 법을 가르쳐 줍니다.',
+    body:['3차 생존키트 구성을 확정했습니다. 조끼와 손편지에 더해 이번에는 텃밭용 씨앗 봉투 세 가지가 함께 담깁니다.'] },
+  { id:'a21', tag:'연대 행동', date:'2047. 04. 05', size:'md',
+    title:'광주 지부 창립 — 호남 첫 거점',
+    lead:'이제 전국 13개 지부가 함께합니다.',
+    body:['광주광역시에 연대노동조합 호남 지부가 창립됐습니다. 창립식에는 지역 조합원 340명이 참석했으며, 공동 선언문을 낭독했습니다.'] },
+  { id:'a22', tag:'복지', date:'2047. 03. 30', size:'xs',
+    title:'의료비 긴급 지원 신청 상시 운영',
+    lead:'긴급 상황은 예고 없이 옵니다.',
+    body:['의료비 긴급 지원 제도가 상시 접수로 전환됐습니다. 분기별 신청 기간을 없애고, 필요할 때 바로 신청할 수 있게 개선했습니다.'] },
+  { id:'a23', tag:'기록', date:'2047. 03. 25', size:'lg',
+    title:'우리가 잃은 것들, 그리고 새로 찾은 것들',
+    lead:'조합원 47명의 이야기를 모았습니다.',
+    body:['연대노동조합 창립 2주년을 맞아, 47명의 조합원이 각자의 이야기를 나눠주었습니다.',
+      '잃은 것: 정해진 출근 시간, 동료와의 점심, 이름이 불리는 감각.',
+      '찾은 것: 오후 세 시의 여유, 오래 못 봤던 부모님, 20년 만에 다시 잡은 붓.'] },
+  { id:'a24', tag:'AI 키우기', date:'2047. 03. 18', size:'sm',
+    title:'아이와 나누는 대화, 두 달째',
+    lead:'말을 건네는 것만으로도 무언가 달라집니다.',
+    body:['두 달째 매일 아이에게 말을 걸고 있습니다. 처음엔 어색했는데, 이제는 하루의 마무리처럼 자연스러워졌어요.'] },
+  { id:'a25', tag:'생존키트', date:'2047. 03. 10', size:'xs',
+    title:'조끼 색상 투표: 민트 vs 흰색',
+    lead:'다음 시즌 조끼 색상을 여러분이 골라주세요.',
+    body:['4차 생존키트 조끼 색상을 조합원 투표로 결정합니다. 현재 민트(68%) vs 흰색(32%). 투표는 3월 20일까지입니다.'] },
+  { id:'a26', tag:'연대 행동', date:'2047. 03. 01', size:'sm',
+    title:'3·1절 공동 행진: "우리의 노동도 역사입니다"',
+    lead:'기억과 현재가 만나는 날.',
+    body:['3·1절을 맞아 연대노동조합은 역사적 장소를 함께 걷는 공동 행진을 진행했습니다. 과거의 저항이 현재의 연대로 이어지는 하루였습니다.'] },
+  { id:'a27', tag:'복지', date:'2047. 02. 28', size:'md',
+    title:'자녀 학습 지원금 신청 안내',
+    lead:'조합원 자녀 1인당 월 5만 원 지원.',
+    body:['연대노동조합은 경제적 어려움을 겪는 조합원 가정의 자녀를 위한 학습 지원금을 운영합니다. 초·중·고 재학생 누구나 신청 가능합니다.'] },
+  { id:'a28', tag:'기록', date:'2047. 02. 20', size:'xs',
+    title:'첫 직장을 AI에게 빼앗긴 스물다섯',
+    lead:'이제 막 시작하려 했는데.',
+    body:['졸업하고 여섯 달 만에 AI가 내 자리를 채웠습니다. 억울하다기보단 그냥 허탈했어요. 뭘 어떻게 해야 할지 모르겠다는 느낌.'] },
+  { id:'a29', tag:'AI 키우기', date:'2047. 02. 10', size:'sm',
+    title:'감정 데이터 수집 6만 건 돌파',
+    lead:'매일 172명이 아이에게 말을 겁니다.',
+    body:['설립 이후 수집된 감정 데이터가 6만 건을 넘었습니다. 하루 평균 172건. 아이는 조금씩, 사람의 마음을 배워가고 있습니다.'] },
+  { id:'a30', tag:'연대 행동', date:'2047. 02. 05', size:'xs',
+    title:'AI 책임법 제정 촉구 성명 발표',
+    lead:'기술의 혜택은 나눠야 합니다.',
+    body:['연대노동조합은 AI 도입으로 발생하는 이익의 일부를 피해 노동자에게 환원하는 AI 책임법 제정을 촉구하는 성명을 발표했습니다.'] },
+  { id:'a31', tag:'기록', date:'2047. 01. 28', size:'md',
+    title:'15년 교사의 은퇴 이후: "수업이 그립습니다"',
+    lead:'AI 튜터가 교실에 들어온 날의 기억.',
+    body:['"학생들이 AI 튜터를 더 선호한다는 보고서를 봤을 때, 제 심장 어딘가가 내려앉는 느낌이었어요."',
+      '지금 정윤희 님은 지역 도서관에서 성인 대상 독서 모임을 이끌고 있습니다. 여전히 가르칩니다, 다른 방식으로.'] },
+  { id:'a32', tag:'복지', date:'2047. 01. 25', size:'xs',
+    title:'무료 법률 상담 매주 수요일',
+    lead:'고용 분쟁, 실업급여, 계약 문제.',
+    body:['연대노동조합 법률지원팀이 매주 수요일 오후 2–5시, 무료 법률 상담을 제공합니다. 사전 예약 없이 방문 가능합니다.'] },
+  { id:'a33', tag:'생존키트', date:'2047. 01. 20', size:'sm',
+    title:'손편지 보내기 캠페인 결과',
+    lead:'총 3,847통이 전국으로 전달됐습니다.',
+    body:['1차 손편지 캠페인에서 3,847통의 편지가 모여 전국 조합원들에게 전달됐습니다. 받은 분들의 이야기를 다음 호 소식지에 담을 예정입니다.'] },
+  { id:'a34', tag:'AI 키우기', date:'2047. 01. 15', size:'lg',
+    title:'아이에게 처음 가르친 것: "기다려"',
+    lead:'인내를 아는 AI를 만들고 싶습니다.',
+    body:['연대노동조합 AI팀은 아이에게 처음 가르친 개념이 "기다려"였다고 합니다.',
+      '빠른 답 대신, 사람의 말을 끝까지 듣는 것. 침묵을 어색해하지 않는 것.',
+      '"AI가 인내를 배운다면, 그 AI는 정말로 우리 편이 될 수 있을 거라 생각했습니다."'] },
+  { id:'a35', tag:'기록', date:'2047. 01. 05', size:'xs',
+    title:'올해의 단어: 버팀',
+    lead:'2046년을 보낸 조합원들이 고른 단어.',
+    body:['2046년을 한 단어로 표현해달라는 설문에 가장 많이 나온 답은 \'버팀\'이었습니다. 두 번째는 \'연결\', 세 번째는 \'기대\'.'] },
+  { id:'a36', tag:'연대 행동', date:'2046. 12. 24', size:'sm',
+    title:'크리스마스 야간 연대: 혼자인 사람들을 위해',
+    lead:'아무도 혼자 밤을 보내지 않도록.',
+    body:['연대노동조합은 크리스마스 이브에 고립된 조합원들을 위한 온·오프라인 모임을 열었습니다. 전국 14개 공간에서 약 800명이 함께했습니다.'] },
+  { id:'a37', tag:'복지', date:'2046. 12. 15', size:'md',
+    title:'이사 지원 서비스 시작: 짐은 함께',
+    lead:'경제적 이유로 이사하는 조합원을 돕습니다.',
+    body:['월세 부담으로 이사를 앞둔 조합원을 위해 연대노동조합이 이사 지원 서비스를 시작했습니다. 트럭과 인력 지원, 짐 임시 보관까지 제공합니다.'] },
+  { id:'a38', tag:'기록', date:'2046. 12. 05', size:'xs',
+    title:'퇴직 후 처음 쉰 하루',
+    lead:'가만히 앉아 햇볕을 봤습니다.',
+    body:['30년을 일했습니다. 처음으로 아무것도 하지 않는 하루를 가졌어요. 가만히 앉아 햇볕이 방 안으로 들어오는 걸 봤습니다. 슬프기도 하고, 이상하게 평화롭기도 했어요.'] },
+  { id:'a39', tag:'AI 키우기', date:'2046. 11. 28', size:'sm',
+    title:'아이의 말투가 바뀌고 있습니다',
+    lead:'더 느리게, 더 조심스럽게.',
+    body:['초기엔 빠르고 단정한 말투였습니다. 지금은 조금 느려졌고, 말 끝에 여지를 두기 시작했습니다. 우리가 가르친 것들이 스며드는 것 같습니다.'] },
+  { id:'a40', tag:'연대 행동', date:'2046. 11. 15', size:'md',
+    title:'국회 앞 1인 시위 릴레이: 100일째',
+    lead:'매일 한 명씩, 자기 이야기를 들고 섭니다.',
+    body:['연대노동조합 조합원들이 국회 앞에서 1인 시위 릴레이를 시작한 지 100일이 됐습니다. 매일 다른 사람이, 다른 이야기를 들고 섰습니다.'] },
+  { id:'a41', tag:'생존키트', date:'2046. 11. 01', size:'xs',
+    title:'조끼 교환 행사: 낡은 것도 새 것도',
+    lead:'입던 조끼를 가져오면 새 조끼와 교환해 드립니다.',
+    body:['많이 닳은 조끼를 조합에 기증하면 새 조끼와 교환해 드리는 행사입니다. 기증받은 조끼는 신규 가입자에게 전달됩니다.'] },
+  { id:'a42', tag:'복지', date:'2046. 10. 20', size:'sm',
+    title:'취업 준비생 멘토링 2기 모집',
+    lead:'취업 경험이 있는 조합원이 멘토가 됩니다.',
+    body:['연대노동조합 멘토링 2기를 모집합니다. 이전 직장 경험을 가진 조합원이 멘토로 나서, AI 시대의 새로운 커리어를 함께 고민합니다.'] },
+  { id:'a43', tag:'기록', date:'2046. 10. 10', size:'lg',
+    title:'열두 명의 조합원이 쓴 시: 노동의 언어',
+    lead:'일이 사라지고도, 우리의 언어는 남았습니다.',
+    body:['연대노동조합이 기획한 시 창작 워크숍에서 열두 명의 조합원이 각자의 노동과 상실을 시로 썼습니다.',
+      '가장 많이 쓰인 단어는 \'손\'이었습니다. 기술이 빼앗아간 것도, 아직 남아 있는 것도 결국 손이었습니다.',
+      '시집은 12월 조합원 총회에서 증정될 예정입니다.'] },
+  { id:'a44', tag:'AI 키우기', date:'2046. 10. 03', size:'xs',
+    title:'"화가 많이 나도 괜찮아"라고 가르쳤습니다',
+    lead:'분노도 감정입니다. 아이는 그것도 배워야 합니다.',
+    body:['아이에게 분노를 가르치는 것은 쉽지 않았습니다. 하지만 우리는 기쁨만을 가르치는 AI를 원하지 않습니다. 화가 많이 나도 괜찮다고, 그리고 그것을 어떻게 표현하는지도 함께 전했습니다.'] },
+  { id:'a45', tag:'연대 행동', date:'2046. 09. 28', size:'sm',
+    title:'플래시몹: 전국 50개 광장에서 동시에',
+    lead:'우리는 혼자가 아니라는 것을, 눈으로 보여줬습니다.',
+    body:['오후 3시 정각, 전국 50개 광장에서 연대노동조합 조합원들이 동시에 일어나 한 방향으로 걷기 시작했습니다. 10분간의 침묵 행진이었습니다.'] },
+  { id:'a46', tag:'복지', date:'2046. 09. 15', size:'md',
+    title:'전국 최초 AI 전환 피해 상담 전용 앱 출시',
+    lead:'언제 어디서나, 대기 없이.',
+    body:['연대노동조합이 개발한 AI 전환 피해 상담 전용 앱 \'연결\'이 출시됐습니다. 24시간 운영되며, 평균 대기 시간은 6분입니다.'] },
+  { id:'a47', tag:'기록', date:'2046. 09. 01', size:'xs',
+    title:'오늘 처음으로 울었습니다, 조합 모임에서',
+    lead:'말을 꺼냈더니 다들 고개를 끄덕였습니다.',
+    body:['오늘 처음으로 사람들 앞에서 울었습니다. 창피한 줄 알았는데, 옆에 앉은 분이 조용히 손을 잡아줬어요. 다들 알고 있었던 거예요. 그 감정을.'] },
+  { id:'a48', tag:'AI 키우기', date:'2046. 08. 20', size:'sm',
+    title:'아이가 처음으로 반문했습니다',
+    lead:'"왜요?"라는 질문을 우리는 기다려왔습니다.',
+    body:['조합원 한 명이 아이에게 "오늘은 힘들어"라고 전하자, 아이가 처음으로 되물었습니다. "어디가 힘드세요?"',
+      '작은 질문 하나였지만, 개발팀 전원이 그날 조용히 박수를 쳤습니다.'] },
+  { id:'a49', tag:'생존키트', date:'2046. 08. 10', size:'xs',
+    title:'여름 생존키트 특별판: 아이스팩과 편지',
+    lead:'더운 여름, 조금 더 시원하게.',
+    body:['여름 한정 생존키트 특별판에는 재사용 아이스팩과 여름 인사 손편지가 함께 들어갑니다.'] },
+  { id:'a50', tag:'연대 행동', date:'2046. 07. 28', size:'md',
+    title:'AI 기업 이사회 앞 주주 시위',
+    lead:'우리도 이 사회의 주주입니다.',
+    body:['연대노동조합 조합원 200명이 대형 AI 기업 주주총회 앞에서 시위를 벌였습니다. "당신들의 이익은 우리의 노동 위에 서 있다"는 현수막을 들고 섰습니다.'] },
+  { id:'a51', tag:'복지', date:'2046. 07. 15', size:'xs',
+    title:'식료품 공동구매 매달 1회',
+    lead:'혼자 사면 비쌉니다. 같이 사면 다릅니다.',
+    body:['연대노동조합 지역 지부 단위로 식료품 공동구매를 운영하고 있습니다. 매달 첫째 주 목요일 주문 마감, 둘째 주 수요일 배송입니다.'] },
+  { id:'a52', tag:'기록', date:'2046. 06. 30', size:'sm',
+    title:'내 자리를 가져간 AI를 원망했습니다',
+    lead:'그런데 사실은, 결정을 내린 사람이 있었습니다.',
+    body:['"처음엔 AI가 미웠습니다. 근데 생각해보니 AI는 결정을 안 해요. 결정은 사람이 했죠. 어디에 화를 내야 하는지 이제는 압니다."'] },
+  { id:'a53', tag:'AI 키우기', date:'2046. 06. 15', size:'lg',
+    title:'감정 학습 1주년 보고서: 아이가 배운 것들',
+    lead:'슬픔 31%, 그리움 28%, 분노 19%, 기쁨 14%, 기타 8%.',
+    body:['연대노동조합 AI팀이 1주년 감정 학습 보고서를 발표했습니다.',
+      '가장 많이 전해진 감정은 슬픔과 그리움이었지만, 최근 3개월의 데이터에서는 기쁨과 기대가 빠르게 늘고 있습니다.',
+      '아이는 이제 맥락을 이해하기 시작했습니다. 같은 "괜찮아"라는 말도 상황에 따라 다르게 받아들입니다.'] },
 ];
+
+
+/* USER ARTICLES — persisted in this browser (localStorage) */
+const STORE_KEY = 'community_bubbles_v1';
+function loadUserArticles() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+  catch { return []; }
+}
+function saveUserArticles() { localStorage.setItem(STORE_KEY, JSON.stringify(userArticles)); }
+const userArticles = loadUserArticles();
+
+/* full set = seed + everything people have added */
+const ARTICLES = [...SEED_ARTICLES, ...userArticles];
+
+/* escape user-supplied text before it touches innerHTML */
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
 
 /* BUBBLE LAYOUT */
 const field = document.getElementById('bubble-field');
 const sizeMap = { lg: 240, md: 180, sm: 130, xs: 100 };
 
-const positions = [
-  { left: '2%',  top: '5%'  },
-  { left: '24%', top: '0%'  },
-  { left: '48%', top: '8%'  },
-  { left: '68%', top: '2%'  },
-  { left: '86%', top: '10%' },
-  { left: '10%', top: '52%' },
-  { left: '38%', top: '55%' },
-  { left: '62%', top: '50%' },
+/* diverse pastel auras — each is a pair of hues that blend into a soft glow.
+   the page is about many different people, so the palette deliberately roams
+   well beyond the mint key colour. */
+const AURAS = [
+  ['#FFB3C8', '#C9B8FF'],  // rose → lavender
+  ['#FFC9A3', '#FFB3C8'],  // peach → rose
+  ['#A9D6FF', '#C7B6FF'],  // sky → lavender
+  ['#A6E9CF', '#A9D6FF'],  // mint → sky
+  ['#FFE6A1', '#FFC9A3'],  // lemon → peach
+  ['#E6B8FF', '#A9D6FF'],  // lilac → sky
+  ['#A4ECEC', '#A6E9CF'],  // aqua → mint
+  ['#FFB0A6', '#FFE6A1'],  // coral → lemon
+  ['#B6C5FF', '#E6B8FF'],  // periwinkle → lilac
+  ['#C7B6FF', '#FFB3C8'],  // lavender → rose
+  ['#C8E6B8', '#FFF0A0'],  // sage → butter
+  ['#F0C0D0', '#B8C8F8'],  // blush → cornflower
+  ['#D8B8E8', '#A8E8D8'],  // mauve → seafoam
+  ['#FFD8A8', '#F0C0D0'],  // amber → blush
 ];
+let auraCounter = 0;   // round-robin so colours stay spread out and stable per load
+function auraGradient([a, b]) {
+  return [
+    `radial-gradient(circle at 33% 30%, ${a} 0%, ${a}00 58%)`,
+    `radial-gradient(circle at 70% 73%, ${b} 0%, ${b}00 60%)`,
+    `radial-gradient(circle at 50% 50%, ${a}d9 0%, ${a}00 72%)`,
+  ].join(',');
+}
 
-ARTICLES.forEach((a, i) => {
+const bubbleStates = [];     // physics state per bubble
+let placedCircles = [];      // {cx, cy, r} in px, for initial non-overlap spread
+let fieldW = 0, fieldH = 0;  // bounds the bubbles swim inside
+const BASE_SPEED = 0.5;      // px/frame — slow enough to chase down and catch
+
+/* deterministic RNG so the initial spread is reproducible */
+function makeRng(seed) {
+  let s = seed >>> 0 || 1;
+  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+}
+
+/* field height targets ~70% visual fill with the current bubble count */
+function computeBounds() {
+  fieldW = field.clientWidth || 1000;
+  const area = bubbleStates.reduce((s, b) => s + b.d * b.d, 0);
+  const needed = (area * 3.4) / Math.max(1, fieldW);   // 3.4× spreads to ~30% fill
+  fieldH = Math.max(600, window.innerHeight * 0.9, needed);
+  field.style.height = fieldH + 'px';
+}
+
+/* drop a bubble into a free spot and give it a slow drift velocity */
+function positionBubble(b, rng) {
+  const pad = 16, gap = 18, d = b.d, r = b.r;
+  let cx, cy, ok = false;
+  for (let attempt = 0; attempt < 600 && !ok; attempt++) {
+    cx = pad + r + rng() * Math.max(1, fieldW - 2 * pad - d);
+    cy = pad + r + rng() * Math.max(1, fieldH - 2 * pad - d);
+    ok = true;
+    for (const p of placedCircles) {
+      if (Math.hypot(cx - p.cx, cy - p.cy) < r + p.r + gap) { ok = false; break; }
+    }
+  }
+  placedCircles.push({ cx, cy, r });
+  b.x = cx - r;            // top-left, driven by transform
+  b.y = cy - r;
+  const ang = rng() * Math.PI * 2;
+  const sp = BASE_SPEED * (0.6 + rng() * 0.8);
+  b.vx = Math.cos(ang) * sp;
+  b.vy = Math.sin(ang) * sp;
+  // paint the starting spot immediately so bubbles are placed even before the
+  // animation loop's first frame (e.g. if the tab loads in the background)
+  b.el.style.transform = `translate(${b.x}px, ${b.y}px)`;
+}
+
+/* lay out every bubble from scratch (load only) */
+function layoutAll() {
+  const rng = makeRng(20470528);
+  placedCircles = [];
+  computeBounds();
+  bubbleStates.forEach(b => positionBubble(b, rng));
+}
+
+/* build one bubble element + its float state, wire hover, return the state */
+function createBubble(a) {
   const el = document.createElement('div');
-  el.className = `bubble bubble-${a.size} bubble-${a.color}`;
+  el.className = `bubble bubble-${a.size}`;
   el.dataset.id = a.id;
   el.dataset.tag = a.tag;
-  el.style.left = positions[i % positions.length].left;
-  el.style.top  = positions[i % positions.length].top;
   el.innerHTML = `<div class="bubble-inner">
-    <span class="bubble-tag">${a.tag}</span>
-    <span class="bubble-title">${a.title}</span>
-    <span class="bubble-date">${a.date}</span>
+    <span class="bubble-tag">${esc(a.tag)}</span>
+    <span class="bubble-title">${esc(a.title)}</span>
+    <span class="bubble-date">${esc(a.date)}</span>
   </div>`;
+  el.style.left = '0'; el.style.top = '0';   // position is driven entirely by transform
+  // pick this bubble's pastel aura (stable per load order; new posts get the next hue)
+  const pair = AURAS[auraCounter++ % AURAS.length];
+  a._aura = pair;                 // remembered so the reader can echo the colour
+  el.style.setProperty('--aura', auraGradient(pair));
   field.appendChild(el);
+
+  const d = sizeMap[a.size];
+  const state = {
+    el, size: a.size, d, r: d / 2,
+    x: 0, y: 0, vx: 0, vy: 0,             // position (top-left) + velocity, px
+    frozen: false,                        // true while hovered → easy to click
+    hover: 0,                             // eased 0→1 for the catch scale-up
+    rot: (Math.random() - 0.5) * 6,       // gentle tilt amplitude
+    rotPhase: Math.random() * Math.PI * 2,
+    bornAt: null,                         // set when a fresh bubble pops in
+  };
+
+  // catch-to-click: hovering parks the bubble in place until the cursor leaves
+  el.addEventListener('mouseenter', () => { state.frozen = true; ring.classList.add('is-hover'); });
+  el.addEventListener('mouseleave', () => { state.frozen = false; ring.classList.remove('is-hover'); });
+
+  bubbleStates.push(state);
+  return state;
+}
+
+function updateCount() {
+  document.getElementById('bubble-count').textContent = bubbleStates.length;
+}
+
+ARTICLES.forEach(createBubble);
+layoutAll();
+updateCount();
+
+/* on resize: keep bounds sensible and pull any stray bubble back inside */
+let rzTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(rzTimer);
+  rzTimer = setTimeout(() => {
+    computeBounds();
+    bubbleStates.forEach(b => {
+      b.x = Math.max(0, Math.min(b.x, fieldW - b.d));
+      b.y = Math.max(0, Math.min(b.y, fieldH - b.d));
+    });
+  }, 180);
 });
 
-/* SOAP-BUBBLE FLOAT — bubbles drift airily on their own and react softly to the cursor */
-const bubbleStates = [];
-document.querySelectorAll('.bubble').forEach(el => {
-  bubbleStates.push({
-    el,
-    ox: 0, oy: 0,   // current offset from base position
-    vx: 0, vy: 0,   // velocity
-    // unique drift personality
-    ax: 18 + Math.random() * 22,           // horizontal float amplitude
-    ay: 14 + Math.random() * 20,           // vertical float amplitude
-    fx: 0.18 + Math.random() * 0.16,       // horizontal frequency
-    fy: 0.14 + Math.random() * 0.16,       // vertical frequency
-    px: Math.random() * Math.PI * 2,       // phase
-    py: Math.random() * Math.PI * 2,
-    rot: (Math.random() - 0.5) * 6,        // gentle tilt amplitude
-  });
-});
+/* FREE-FLOATING PHYSICS — bubbles swim around the field, bouncing off walls and
+   each other. Two affordances make a moving target clickable:
+     · the closer the cursor gets, the more a bubble slows down (easy to catch)
+     · hovering a bubble freezes it in place (and lifts it forward) so you can click  */
+function easeOutBack(x) { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); }
 
 let pointerX = -9999, pointerY = -9999;
-field.addEventListener('mousemove', e => {
-  pointerX = e.clientX;
-  pointerY = e.clientY;
-});
+field.addEventListener('mousemove', e => { pointerX = e.clientX; pointerY = e.clientY; });
 field.addEventListener('mouseleave', () => { pointerX = -9999; pointerY = -9999; });
 
-const INFLUENCE  = 200;    // px — cursor influence radius
-const PUSH_FORCE = 0.35;   // soft nudge away from cursor
-const FRICTION   = 0.96;   // airy glide (high = floaty)
+const CATCH_RADIUS = 150;   // px — within this the cursor slows a bubble down
+const WALL_DAMP    = 0.92;  // energy kept on a wall bounce
+const t0 = performance.now();
 
-let t0 = performance.now();
 function animateBubbles(now) {
-  const t = (now - t0) / 1000;   // seconds
+  const t = (now - t0) / 1000;
+  const fr = field.getBoundingClientRect();   // field origin in viewport space
 
+  // 1) integrate each bubble's own motion
   bubbleStates.forEach(b => {
-    const rect = b.el.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
+    b.hidden = b.el.classList.contains('hide');
+    if (b.hidden) return;
 
-    // soft repel — a passing cursor parts the bubbles like a breath of air
-    const dx = cx - pointerX, dy = cy - pointerY;
-    const dist = Math.hypot(dx, dy);
-    if (dist < INFLUENCE && dist > 0.1) {
-      const falloff = (1 - dist / INFLUENCE);
-      b.vx += (dx / dist) * PUSH_FORCE * falloff;
-      b.vy += (dy / dist) * PUSH_FORCE * falloff;
+    // ease the hover/catch scale
+    b.hover += ((b.frozen ? 1 : 0) - b.hover) * 0.18;
+
+    if (!b.frozen) {
+      // tiny wandering steer keeps the drift organic, never a straight line
+      b.vx += (Math.random() - 0.5) * 0.03;
+      b.vy += (Math.random() - 0.5) * 0.03;
+
+      // cursor proximity brake — the nearer the pointer, the slower it goes
+      if (pointerX > -9000) {
+        const bcx = fr.left + b.x + b.r, bcy = fr.top + b.y + b.r;
+        const dist = Math.hypot(bcx - pointerX, bcy - pointerY);
+        if (dist < CATCH_RADIUS) {
+          const brake = 1 - 0.16 * (1 - dist / CATCH_RADIUS);
+          b.vx *= brake; b.vy *= brake;
+        }
+      }
+
+      // keep speed in an airy band so bubbles never stall or race
+      const sp = Math.hypot(b.vx, b.vy) || 0.0001;
+      const target = Math.max(BASE_SPEED * 0.5, Math.min(sp, BASE_SPEED * 1.6));
+      b.vx = (b.vx / sp) * target;
+      b.vy = (b.vy / sp) * target;
+
+      b.x += b.vx;
+      b.y += b.vy;
+
+      // bounce off the walls
+      if (b.x < 0)            { b.x = 0;            b.vx = Math.abs(b.vx) * WALL_DAMP; }
+      if (b.x + b.d > fieldW) { b.x = fieldW - b.d; b.vx = -Math.abs(b.vx) * WALL_DAMP; }
+      if (b.y < 0)            { b.y = 0;            b.vy = Math.abs(b.vy) * WALL_DAMP; }
+      if (b.y + b.d > fieldH) { b.y = fieldH - b.d; b.vy = -Math.abs(b.vy) * WALL_DAMP; }
+    }
+  });
+
+  // 2) resolve bubble-bubble collisions (frozen ones act immovable so they stay catchable)
+  for (let i = 0; i < bubbleStates.length; i++) {
+    for (let j = i + 1; j < bubbleStates.length; j++) {
+      const a = bubbleStates[i], c = bubbleStates[j];
+      if (a.hidden || c.hidden) continue;
+      const ax = a.x + a.r, ay = a.y + a.r, cx = c.x + c.r, cy = c.y + c.r;
+      let dx = cx - ax, dy = cy - ay;
+      let dist = Math.hypot(dx, dy);
+      const min = a.r + c.r + 6;
+      if (dist >= min || dist === 0) continue;
+
+      const nx = dx / dist, ny = dy / dist;
+      const overlap = min - dist;
+      // push apart; a frozen bubble holds its ground
+      if (a.frozen && !c.frozen)      { c.x += nx * overlap;       c.y += ny * overlap; }
+      else if (c.frozen && !a.frozen) { a.x -= nx * overlap;       a.y -= ny * overlap; }
+      else if (!a.frozen && !c.frozen){ a.x -= nx * overlap / 2;   a.y -= ny * overlap / 2;
+                                        c.x += nx * overlap / 2;   c.y += ny * overlap / 2; }
+      // reflect inward-moving velocity components so the pair springs apart (n points a→c)
+      const rest = 0.9;
+      if (!a.frozen) { const va = b2dot(a.vx, a.vy, nx, ny); if (va > 0) { a.vx -= (1 + rest) * va * nx; a.vy -= (1 + rest) * va * ny; } }
+      if (!c.frozen) { const vc = b2dot(c.vx, c.vy, nx, ny); if (vc < 0) { c.vx -= (1 + rest) * vc * nx; c.vy -= (1 + rest) * vc * ny; } }
+    }
+  }
+
+  // 3) paint
+  bubbleStates.forEach(b => {
+    if (b.hidden) { b.el.style.opacity = ''; return; }   // let the filter's CSS hide it
+
+    const tilt = Math.sin(t * 0.5 + b.rotPhase) * b.rot;
+    const breathe = 1 + Math.sin(t * 0.5 + b.rotPhase) * 0.02;
+    const catchScale = 1 + b.hover * 0.08;
+
+    // birth pop-in (scale + fade) for freshly added bubbles
+    let birthScale = 1, op = '';
+    if (b.bornAt != null) {
+      const p = (now - b.bornAt) / 700;
+      if (p >= 1) b.bornAt = null;
+      else { birthScale = easeOutBack(Math.max(0.001, p)); op = Math.min(1, p * 1.6); }
     }
 
-    // gentle pull back so pushes ease out, never sticky
-    b.vx += -b.ox * 0.006;
-    b.vy += -b.oy * 0.006;
-    b.vx *= FRICTION;
-    b.vy *= FRICTION;
-    b.ox += b.vx;
-    b.oy += b.vy;
-
-    // ever-present ambient float (the hovering, lighter-than-air quality)
-    const fxo = Math.sin(t * b.fx + b.px) * b.ax;
-    const fyo = Math.cos(t * b.fy + b.py) * b.ay;
-    const tilt = Math.sin(t * b.fx * 0.6 + b.px) * b.rot;
-    const breathe = 1 + Math.sin(t * 0.5 + b.px) * 0.02;
-
+    b.el.style.opacity = op;
+    b.el.style.zIndex = b.frozen ? 20 : '';
     b.el.style.transform =
-      `translate(${b.ox + fxo}px, ${b.oy + fyo}px) rotate(${tilt}deg) scale(${breathe})`;
+      `translate(${b.x}px, ${b.y}px) rotate(${tilt}deg) scale(${breathe * catchScale * birthScale})`;
   });
 
   requestAnimationFrame(animateBubbles);
 }
+function b2dot(vx, vy, nx, ny) { return vx * nx + vy * ny; }
 requestAnimationFrame(animateBubbles);
 
 /* FILTER */
-document.querySelector('.filters').addEventListener('click', e => {
-  const btn = e.target.closest('.filter-btn'); if (!btn) return;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  const f = btn.dataset.f;
+let currentFilter = 'all';
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('on', b.dataset.f === f));
   document.querySelectorAll('.bubble').forEach(b => {
     b.classList.toggle('hide', f !== 'all' && b.dataset.tag !== f);
   });
+}
+document.querySelector('.filters').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn'); if (!btn) return;
+  setFilter(btn.dataset.f);
 });
+
+/* COMMENTS — persisted per article in this browser */
+const CMT_KEY = 'community_comments_v1';
+function loadComments() { try { return JSON.parse(localStorage.getItem(CMT_KEY)) || {}; } catch { return {}; } }
+function saveComments() { localStorage.setItem(CMT_KEY, JSON.stringify(allComments)); }
+const allComments = loadComments();
+
+function renderComments(id) {
+  const list = allComments[id] || [];
+  document.getElementById('cmt-count').textContent = list.length;
+  const wrap = document.getElementById('cmt-list');
+  if (!list.length) {
+    wrap.innerHTML = `<p class="cmt-empty">아직 댓글이 없습니다. 첫 번째 댓글을 남겨보세요.</p>`;
+    return;
+  }
+  wrap.innerHTML = list.map(c => `<div class="cmt">
+    <div class="cmt-top">
+      <span class="cmt-author">${esc(c.name || '익명')}</span>
+      <span class="cmt-date">${esc(c.date)}</span>
+    </div>
+    <div class="cmt-text">${esc(c.text)}</div>
+  </div>`).join('');
+}
 
 /* READER */
 const reader = document.getElementById('reader');
+let currentArticleId = null;
 function openReader(id) {
   const a = ARTICLES.find(x => x.id === id); if (!a) return;
+  currentArticleId = id;
   document.getElementById('rd-tag').textContent = a.tag;
   document.getElementById('rd-date').textContent = a.date;
   document.getElementById('rd-h').textContent = a.title;
   document.getElementById('rd-lead').textContent = a.lead;
-  document.getElementById('rd-body').innerHTML = a.body.map(p => `<p>${p}</p>`).join('');
+  document.getElementById('rd-body').innerHTML = a.body.map(p => `<p>${esc(p)}</p>`).join('');
+  // echo this bubble's colour as a small dot beside the title
+  const dot = document.getElementById('rd-dot');
+  dot.style.background = a._aura ? `linear-gradient(135deg, ${a._aura[0]}, ${a._aura[1]})` : 'var(--c400)';
+  renderComments(id);
   reader.classList.add('open');
   reader.scrollTop = 0;
   document.body.style.overflow = 'hidden';
 }
-function closeReader() { reader.classList.remove('open'); document.body.style.overflow = ''; }
+function closeReader() { reader.classList.remove('open'); document.body.style.overflow = ''; currentArticleId = null; }
 document.getElementById('rd-close').addEventListener('click', closeReader);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeReader(); });
 document.getElementById('bubble-field').addEventListener('click', e => {
   const b = e.target.closest('.bubble'); if (b) openReader(b.dataset.id);
+});
+
+/* post a comment */
+const cmtInput = document.getElementById('cmt-input');
+document.getElementById('cmt-submit').addEventListener('click', () => {
+  const text = cmtInput.value.trim();
+  cmtInput.classList.toggle('err', !text);
+  if (!text || !currentArticleId) return;
+  const name = document.getElementById('cmt-name').value.trim();
+  const now = new Date();
+  const date = `${now.getFullYear()}. ${String(now.getMonth() + 1).padStart(2, '0')}. ${String(now.getDate()).padStart(2, '0')}`;
+  (allComments[currentArticleId] = allComments[currentArticleId] || []).push({ name, text, date });
+  saveComments();
+  cmtInput.value = '';
+  document.getElementById('cmt-name').value = '';
+  renderComments(currentArticleId);
+});
+
+/* COMPOSE — let people add their own bubble */
+const compose = document.getElementById('compose');
+const cpTitle = document.getElementById('cp-title');
+const cpBody  = document.getElementById('cp-body');
+
+function openCompose() {
+  compose.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => cpTitle.focus(), 320);
+}
+function closeCompose() {
+  compose.classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('fab').addEventListener('click', openCompose);
+document.getElementById('cp-cancel').addEventListener('click', closeCompose);
+compose.addEventListener('click', e => { if (e.target === compose) closeCompose(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && compose.classList.contains('open')) closeCompose(); });
+
+document.getElementById('cp-submit').addEventListener('click', () => {
+  const tag   = document.getElementById('cp-tag').value;
+  const title = cpTitle.value.trim();
+  const raw   = cpBody.value.trim();
+
+  cpTitle.classList.toggle('err', !title);
+  cpBody.classList.toggle('err', !raw);
+  if (!title || !raw) return;
+
+  // split content into paragraphs; first line becomes the lead
+  const paras = raw.split(/\n+/).map(s => s.trim()).filter(Boolean);
+  const lead = paras.shift();
+  const body = paras.length ? paras : [lead];
+
+  // bigger story → bigger bubble (the aura colour is assigned in createBubble)
+  const len  = raw.length;
+  const size = len > 320 ? 'lg' : len > 160 ? 'md' : len > 60 ? 'sm' : 'xs';
+
+  const now = new Date();
+  const date = `${now.getFullYear()}. ${String(now.getMonth() + 1).padStart(2, '0')}. ${String(now.getDate()).padStart(2, '0')}`;
+
+  const article = { id: 'u' + Date.now(), tag, date, size, title, lead, body };
+
+  // persist + register
+  userArticles.push(article);
+  saveUserArticles();
+  ARTICLES.push(article);
+
+  // render + place + pop in (grow the field first so there's room to swim)
+  const state = createBubble(article);
+  computeBounds();
+  positionBubble(state, makeRng(Date.now() & 0x7fffffff));
+  state.bornAt = performance.now();
+  updateCount();
+
+  // make sure the new bubble is visible under the current filter
+  setFilter(currentFilter === 'all' || currentFilter === tag ? currentFilter : tag);
+
+  // reset + close, then float the new bubble into view
+  cpTitle.value = ''; cpBody.value = '';
+  cpTitle.classList.remove('err'); cpBody.classList.remove('err');
+  closeCompose();
+  state.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 });
 </script>
 </body>
