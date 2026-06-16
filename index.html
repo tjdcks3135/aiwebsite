@@ -662,7 +662,7 @@ let zoomLocked    = false;
 let scrollStarted = false;
 let lastInteract  = Date.now();
 const IDLE_DELAY  = 2800;      /* ms before auto-spin resumes */
-const AUTO_SPEED  = 0.004;     /* radians per ticker frame (~0.24°/frame) */
+const AUTO_SPEED  = 0.01;     /* radians per ticker frame (~0.40°/frame) */
 
 function markInteraction() { lastInteract = Date.now(); }
 
